@@ -2,6 +2,10 @@
   "name": "awesome_detector",
   "version": "0.1.0",
   "private": true,
+  "description": "Awesome Detector",
+  "author": "Huang Yuanyuan",
+  "main": "main.js",
+  "homepage": "./",
   "dependencies": {
     "@material-ui/core": "^4.4.0",
     "@material-ui/icons": "^4.2.1",
@@ -9,6 +13,7 @@
     "clsx": "^1.0.4",
     "echarts": "^4.5.0",
     "echarts-for-react": "^2.0.15-beta.1",
+    "electron": "^7.1.7",
     "prop-types": "^15.7.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -18,6 +23,9 @@
     "superagent": "^5.1.0"
   },
   "scripts": {
+    "package": "electron-packager . --overwrite",
+    "package-linux": "electron-packager .  awesome_detector --excutableName awesome_detector --overwrite --platform=linux --arch=x64 --icon=src/logo.svg --prune=true --out=release-builds",
+    "create-debian-installer": "electron-installer-debian --description AwesomeQoS --src release-builds/awesome_detector-linux-x64/ --arch amd64 --config debian.json",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -37,5 +45,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron-packager": "^14.1.1"
   }
 }

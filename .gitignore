@@ -10,6 +10,9 @@
 
 # production
 /build
+/release-builds
+/electron-linux-x64
+/awesome_detector*
 
 # misc
 .DS_Store

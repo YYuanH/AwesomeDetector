@@ -1,7 +1,10 @@
 import request from 'superagent';
-import { test, testIP } from './serverIP';
-
+const electron = window.require('electron');
+const fs = electron.remote.require('fs');
 const agent = request.agent();
+var test = true;
+var testIP = JSON.parse(fs.readFileSync('config.json', 'utf-8')).testIp;
+// var testIP = JSON.parse(fs.readFileSync('/usr/lib/awesome-detector/config.json', 'utf-8')).testIp;
 
 {/* 请求修改密码 */}
 export function ModifyPassword(data) {

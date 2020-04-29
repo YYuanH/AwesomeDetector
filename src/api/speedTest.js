@@ -1,8 +1,11 @@
 import request from 'superagent';
-import { test, testIP } from './serverIP';
+const electron = window.require('electron');
+const fs = electron.remote.require('fs');
 
 const agent = request.agent();
-
+var test = true;
+var testIP = JSON.parse(fs.readFileSync('config.json', 'utf-8')).testIp;
+// var testIP = JSON.parse(fs.readFileSync('/usr/lib/awesome-detector/config.json', 'utf-8')).testIp;
 {/* 获取在线客户端列表 */}
 export function GetList() {
     let url = '/api/v1/get/clients';
