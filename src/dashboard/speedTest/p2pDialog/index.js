@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles, withStyles, Button, Dialog, DialogTitle, DialogContent, DialogActions, RadioGroup } from '@material-ui/core';
+import { makeStyles, withStyles, Button, Dialog, DialogTitle, DialogContent, DialogActions, RadioGroup, TextField, InputAdornment } from '@material-ui/core';
 import { FormControlLabel, Radio } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
 
@@ -35,8 +35,22 @@ export default function P2PDialog(props) {
         >
             <DialogTitle>客户端{id}可向以下某一客户端发起P2P网络{type}速率测速：</DialogTitle>
             <DialogContent dividers>
+                <TextField
+                    required
+                    autoFocus
+                    className={classes.space}
+                    id="param"
+                    label="测速数据"
+                    onChange={onChange('param')}
+                    variant="outlined"
+                    //margin="normal"
+                    size="small"
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                    }}
+                />
                 <RadioGroup
-                    onChange={onChange}
+                    onChange={onChange('idTo')}
                     value={idTo}
                     aria-label='p2p-list'
                     name='list'

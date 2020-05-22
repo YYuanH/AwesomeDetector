@@ -19,9 +19,9 @@ const ColorButton = withStyles(theme => ({
     },
 }))(Button);
 
-export default function UdpDialog(props) {
+export default function UpDialog(props) {
     const classes = useStyles();
-    const { open, id, type, onClose, onChange, onClick } = props;
+    const { open, id, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -30,45 +30,33 @@ export default function UdpDialog(props) {
             fullWidth
             maxWidth = 'sm'
         >
-            <DialogTitle>客户端{id} UDP{type}测速参数：</DialogTitle>
+            <DialogTitle>客户端{id} 上行测速参数：</DialogTitle>
             <DialogContent dividers>
             <TextField
                 required
                 autoFocus
                 className={classes.space}
-                id="duration"
-                label="测试持续时间"
-                onChange={onChange('duration')}
+                id="params"
+                label="测速数据"
+                onChange={onChange}
                 variant="outlined"
                 margin="normal"
                 InputProps={{
-                    endAdornment: <InputAdornment position="end">秒</InputAdornment>,
-                }}
-            />
-            <TextField
-                required
-                id="speed"
-                label="测试速度"
-                onChange={onChange('speed')}
-                variant="outlined"
-                margin="normal"
-                InputProps={{
-                    endAdornment: <InputAdornment position="end">Mb/s</InputAdornment>,
+                    endAdornment: <InputAdornment position="end">MB</InputAdornment>,
                 }}
             />
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起UDP{type}测速</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起上行测速</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog >
     );
 }
 
-UdpDialog.propTypes = {
+UpDialog.propTypes = {
     open: PropTypes.bool,
     id: PropTypes.number,
-    type: PropTypes.string,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,

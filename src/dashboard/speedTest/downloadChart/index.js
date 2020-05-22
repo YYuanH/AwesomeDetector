@@ -26,11 +26,11 @@ export default function DownloadChart(props) {
             <Typography color='primary' variant='subtitle1' className={classes.title} >
                 下行速度
             </Typography>
-            <MyLine data={downData[0]} clientId={clientId} style={{ height: cardHeight - 12 }} />
+            <MyLine data={downData} clientId={clientId} style={{ height: cardHeight - 12 }} />
         </Paper>
     );
 }
 
 DownloadChart.propTypes = {
-    downData: PropTypes.array.isRequired
+    downData: PropTypes.object.isRequired
 }

@@ -92,7 +92,7 @@ export default function ClientList(props) {
                                         color='primary'
                                         disabled={item.uploadLoading}
                                         className={classes.button}
-                                        onClick={() => onClickTestUploadSpeed(item.client_id, item.ip, item.mac, index)}
+                                        onClick={() => onClickTestUploadSpeed(item.client_id)}
                                     >
                                         上行测速
                                     </ColorButton>
@@ -159,7 +159,7 @@ export default function ClientList(props) {
                                         color='primary'
                                         disabled={item.pingLoading || item.routerLoading}
                                         className={classes.button}
-                                        onClick={() => onClickPing(item.client_id, item.ip, item.mac, index)}
+                                        onClick={() => onClickPing(item.client_id)}
                                     >
                                         路由跳数/延迟
                                     </ColorButton>
