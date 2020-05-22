@@ -14,8 +14,7 @@ export function GetList() {
                 .withCredentials();
 }
 
-
-{/* 获取指定客户端的路由跳数和延迟，参数：client_id */}
+{/* 获取指定客户端的路由跳数和丢包率，参数：client_id */}
 export function GetClientInfo(data) {
     let url = '/api/v1/get/client/info';
     if(test)
@@ -23,6 +22,17 @@ export function GetClientInfo(data) {
     return agent.post(url)
                 .send(data)
                 .accept('application/json')
+                .withCredentials();
+}
+
+{/* 获取延时，参数：client_id, start_time, end_time */}
+export function GetDelay(data) {
+    let url = '/api/v1/get/client/ping';
+    if(test)
+        url = testIP + url;
+    return agent.post(url)
+                .send(data)
+                .accept("application/json")
                 .withCredentials();
 }
 
