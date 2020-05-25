@@ -1,12 +1,13 @@
 import React from 'react';
-import { makeStyles, Container, Paper, Typography, Divider, Button, Popover, CircularProgress, LinearProgress } from '@material-ui/core';
+import { Grid, TextField, FormControl, FormControlLabel, RadioGroup, Radio, FormLabel } from '@material-ui/core';
+import { makeStyles, Container, Paper, Typography, Divider, Button, Popover, CircularProgress } from '@material-ui/core';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@material-ui/core';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
 import ComputerIcon from '@material-ui/icons/Computer';
 
 import { GetList } from '../../api/speedTest';
-import { CreateMission, IsFinished, GetResult } from '../../api/mission';
+import { CreateMission, IsFinished, GetResult, CreateAttackMission } from '../../api/mission';
 import ErrorDialog from '../speedTest/errorDialog';
 
 const useStyles = makeStyles(theme => ({
@@ -20,6 +21,13 @@ const useStyles = makeStyles(theme => ({
     },
     button: {
         marginRight: theme.spacing(2),
+    },
+    attack_button: {
+        marginLeft: theme.spacing(9),
+        marginTop: theme.spacing(3)
+    },
+    text: {
+        margin: theme.spacing(2),
     },
     popover: {
         pointerEvents: 'none',
@@ -55,11 +63,14 @@ export default function AttackTest(props) {
     const [clientList, setClientList] = React.useState(Array);
     {/* primary表示“安全”，secondary表示“有风险”，default表示“尚未测试” */ }
     const [states, setStates] = React.useState(Array);
-    // const [loading, setLoading] = React.useState(false);
+    const [values, setValues] = React.useState({
+        target_ip: '',
+        target_port: '',
+        type: ''
+    })
 
     {/* 关闭Popover */ }
     const handleClosePopover = () => setAnchorEl(null);
-
     {/* 打开Popover，并显示不同颜色按钮的含义 */ }
     const handleOpenPopover = (event, type) => {
         switch (type) {
@@ -129,7 +140,6 @@ export default function AttackTest(props) {
             }
         }).catch(err => console.log(err))
     }, [])
-
 
     {/* 查询任务状态，任务完成时请求任务结果 */ }
     const checking = (mission_id, index, type) => {
@@ -228,23 +238,23 @@ export default function AttackTest(props) {
                 states_temp[index].shaLoading = true;
                 break;
         }
-        var time = type === 'SHA' ? 80000 : 40000;
+        var time = type === 'SHA' ? 105000 : 40000;
         setStates(states_temp);
         //当计时器对象为空时，初始化计时器对象为{}
-        if(!document.checkingTimerInterval) {
+        if (!document.checkingTimerInterval) {
             document.checkingTimerInterval = {};
         }
-        if(!document.checkingTimerInterval[id]){
+        if (!document.checkingTimerInterval[id]) {
             document.checkingTimerInterval[id] = {};
         }
         //当超时监听对象为空时，初始化超时监听对象为{}
-        if(!document.attackTestTimeout) {
+        if (!document.attackTestTimeout) {
             document.attackTestTimeout = {}
         }
-        if(!document.attackTestTimeout[id]) {
+        if (!document.attackTestTimeout[id]) {
             document.attackTestTimeout[id] = {}
         }
-        
+
         //创建任务
         CreateMission(data).then(res => {
             let errMsg = type === 'SHA' ? 'HTTP长连接' : type;
@@ -286,73 +296,137 @@ export default function AttackTest(props) {
         setOpenErrorDialog(true);
     }
 
+    const handleSubmit = e => {
+        e.preventDefault();
+        CreateAttackMission(values).then(res => {
+            if(!res.body.status) {
+                console.log(res.body);
+                handleOpenErrorDialog("攻击测试任务创建失败！");
+            } else {
+
+            }
+        }).catch(err => console.log(err));
+    }
+
+    const handleChange = name => event => {
+        if (name === 'target_ip')
+            setValues({ ...values, [name]: event.target.value })
+        else if (name === "target_port")
+            setValues({ ...values, [name]: event.target.value })
+        else
+            setValues({ ...values, [name]: event.target.value })
+    }
+
 
     return (
         <Container maxWidth='lg' className={classes.container}>
-            {/* {console.log(states,clientList)} */}
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={msg} />
-            <Paper style={{ height: '85vh' }}>
-                <Typography variant='subtitle1' color='primary' className={classes.title}>
-                    在线设备洪水攻击测试
-                </Typography>
-                <Divider />
-                <div style={{ height: '75vh', overflowY: 'scroll' }}>
-                    <List>
-                        {clientList.map((item, index) => (
-                            <ListItem key={index}>
-                                <ListItemIcon>
-                                    <ComputerIcon />
-                                </ListItemIcon>
-                                <ListItemText
-                                    style={{ whiteSpace: 'pre' }}
-                                    primary={item.client_id}
-                                    secondary={`状态:${item.status}    IP:${item.ip}    MAC:${item.mac}    OS:${item.operation_system}`}
-                                />
-                                <ListItemSecondaryAction>
-                                    <MuiThemeProvider theme={theme}>
-                                        <Button
-                                            variant='contained'
-                                            color={states[index].SYN}
-                                            className={classes.button}
-                                            onClick={() => handleClick(item.client_id, item.ip, item.mac, 'SYN', index)}
-                                            onMouseEnter={(event) => handleOpenPopover(event, states[index].SYN)}
-                                            onMouseLeave={handleClosePopover}
-                                            disabled={states[index].synLoading}
-                                        >
-                                            SYN洪水
-                                        </Button>
-                                        {states[index].synLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                                        <Button
-                                            variant='contained'
-                                            color={states[index].UDP}
-                                            className={classes.button}
-                                            onClick={() => handleClick(item.client_id, item.ip, item.mac, 'UDP', index)}
-                                            onMouseEnter={(event) => { handleOpenPopover(event, states[index].UDP) }}
-                                            onMouseLeave={handleClosePopover}
-                                            disabled={states[index].udpLoading}
-                                        >
-                                            UDP洪水
-                                        </Button>
-                                        {states[index].udpLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                                        <Button
-                                            variant='contained'
-                                            color={states[index].SHA}
-                                            className={classes.button}
-                                            onClick={() => handleClick(item.client_id, item.ip, item.mac, 'SHA', index)}
-                                            onMouseEnter={(event) => { handleOpenPopover(event, states[index].SHA) }}
-                                            onMouseLeave={handleClosePopover}
-                                            disabled={states[index].shaLoading}
-                                        >
-                                            HTTP长连接
-                                        </Button>
-                                        {states[index].shaLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                                    </MuiThemeProvider>
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        ))}
-                    </List>
-                </div>
-            </Paper>
+            <Grid container spacing={4}>
+                <Grid item xs={12} lg={12}>
+                    <Paper>
+                        <form onSubmit={handleSubmit}>
+                            <Typography variant='subtitle1' color='primary' className={classes.title}>
+                                指定设备洪水攻击测试
+                            </Typography>
+                            <Divider />
+                            <TextField
+                                required
+                                className={classes.text}
+                                id="ip"
+                                label="IP地址"
+                                onChange={handleChange("target_ip")}
+                                variant="outlined"
+                                margin="normal"
+                            />
+                            <TextField
+                                required
+                                className={classes.text}
+                                id="port"
+                                label="端口"
+                                onChange={handleChange("target_port")}
+                                variant="outlined"
+                                margin="normal"
+                            />
+                            <FormControl className={classes.text}>
+                                <FormLabel>攻击类型：</FormLabel>
+                                <RadioGroup row value={values.type} onChange={handleChange('type')}>
+                                    <FormControlLabel value='SYN' label="SYN洪水" control={<Radio />} />
+                                    <FormControlLabel value='UDP' label="UDP洪水" control={<Radio />} />
+                                    <FormControlLabel value='SHA' label="HTTP长连接" control={<Radio />} />
+                                </RadioGroup>
+                            </FormControl>
+                            <Button type='submit' variant='contained' color='primary' className={classes.attack_button}>
+                                发起攻击测试
+                            </Button>
+                        </form>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} lg={12}>
+                    <Paper>
+                        <Typography variant='subtitle1' color='primary' className={classes.title}>
+                            在线设备洪水攻击测试
+                        </Typography>
+                        <Divider />
+                        <div style={{ height: '60vh', overflowY: 'scroll' }}>
+                            <List>
+                                {clientList.map((item, index) => (
+                                    <ListItem key={index}>
+                                        <ListItemIcon>
+                                            <ComputerIcon />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            style={{ whiteSpace: 'pre' }}
+                                            primary={item.client_id}
+                                            secondary={`状态:${item.status}    IP:${item.ip}    MAC:${item.mac}    OS:${item.operation_system}`}
+                                        />
+                                        <ListItemSecondaryAction>
+                                            <MuiThemeProvider theme={theme}>
+                                                <Button
+                                                    variant='contained'
+                                                    color={states[index].SYN}
+                                                    className={classes.button}
+                                                    onClick={() => handleClick(item.client_id, item.ip, item.mac, 'SYN', index)}
+                                                    onMouseEnter={(event) => handleOpenPopover(event, states[index].SYN)}
+                                                    onMouseLeave={handleClosePopover}
+                                                    disabled={states[index].synLoading}
+                                                >
+                                                    SYN洪水
+                                                </Button>
+                                                {states[index].synLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                                <Button
+                                                    variant='contained'
+                                                    color={states[index].UDP}
+                                                    className={classes.button}
+                                                    onClick={() => handleClick(item.client_id, item.ip, item.mac, 'UDP', index)}
+                                                    onMouseEnter={(event) => { handleOpenPopover(event, states[index].UDP) }}
+                                                    onMouseLeave={handleClosePopover}
+                                                    disabled={states[index].udpLoading}
+                                                >
+                                                    UDP洪水
+                                                </Button>
+                                                {states[index].udpLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                                <Button
+                                                    variant='contained'
+                                                    color={states[index].SHA}
+                                                    className={classes.button}
+                                                    onClick={() => handleClick(item.client_id, item.ip, item.mac, 'SHA', index)}
+                                                    onMouseEnter={(event) => { handleOpenPopover(event, states[index].SHA) }}
+                                                    onMouseLeave={handleClosePopover}
+                                                    disabled={states[index].shaLoading}
+                                                >
+                                                    HTTP长连接
+                                                </Button>
+                                                {states[index].shaLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                            </MuiThemeProvider>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </div>
+                    </Paper>
+                </Grid>
+            </Grid>
+
             <Popover
                 classes={{ paper: classes.popoverPaper }}
                 className={classes.popover}
