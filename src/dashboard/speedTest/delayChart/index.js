@@ -17,15 +17,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function DelayChart(props) {
-    const { delayData, clientId } = props;
+    const { delayData, clientId, extraData } = props;
     const classes = useStyles();
+    console.log(extraData)
 
     return (
         <Paper className={classes.paperHeight}>
             <Typography color='primary' variant='subtitle1' className={classes.title} >
                 延时
             </Typography>
-            <MyLine data={delayData} style={{ height: cardHeight - 12 }} clientId={clientId} />
+            <MyLine data={delayData} style={{ height: cardHeight - 12 }} clientId={clientId} extraData={extraData}/>
         </Paper>
     );
 }

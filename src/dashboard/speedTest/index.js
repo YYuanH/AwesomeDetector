@@ -101,7 +101,7 @@ const loadingReducer = (state, action) => {
 let preUpData = {};
 let preDownData = {};
 let preDelayData = {};
-let prePing, preRouter;
+let preLossRate, preRouters;
 let preClientId, preClientIdUp, preClientIdDown, preDelayClientId;
 
 export default function SpeedTest(props) {
@@ -161,10 +161,10 @@ export default function SpeedTest(props) {
     const [upData, setUpData] = React.useState({});
     const [downData, setDownData] = React.useState({});
     const [delayData, setDelayData] = React.useState({});
-    const [values, setValues] = React.useState([
-        { name: 'ping', value: '' },
-        { name: 'routers', value: '' },
-    ]);
+    const [values, setValues] = React.useState({
+        loss_rate: '', //丢包率
+        routers: '' //路由跳数
+    });
 
     const [chartLoading, dispatch] = useReducer(loadingReducer, {
         // uploadChartLoading: false,
@@ -174,14 +174,17 @@ export default function SpeedTest(props) {
     });
 
     {/* 获取客户端列表 */ }
-    React.useEffect(() => {
-        var values_temp = [].concat(values);
-        values_temp[0].value = prePing;
-        values_temp[1].value = preRouter;
+    React.useEffect(() => { 
+        // var values_temp = [].concat(values);
+        // values_temp[0].value = preLossRate;
+        // values_temp[1].value = preRouters;
         setUpData(preUpData);
         setDownData(preDownData);
         setDelayData(preDelayData);
-        setValues(values_temp);
+        setValues({
+            loss_rate: preLossRate,
+            routers: preRouters
+        });
 
         GetList().then(res => {
             if (res.body.status) {
@@ -216,6 +219,7 @@ export default function SpeedTest(props) {
             start_time: start_time,
             end_time: end_time
         }
+        var temp;
         console.log(client_id, 'get data of delay..');
         GetDelay(data_delay).then(res => {
             //成功获取延时数据，并查询任务是否完成，如果完成，请求丢包率
@@ -237,12 +241,12 @@ export default function SpeedTest(props) {
                                 console.log(client_id, 'require the loss_rate..')
                                 if (res.body.status) {
                                     var list = [].concat(onlineMachineList);
-                                    var values_temp = [].concat(values);
+                                    // var values_temp = [].concat(values);
                                     list[index].pingLoading = false;
-                                    values_temp[0].value = res.body.data.client_info[0].value;
-                                    prePing = values_temp[0].value;
-                                    setValues(values_temp);
                                     setOnlineMachineList(list);
+                                    temp = res.body.data.client_info[0].value;
+                                    preLossRate = temp;
+                                    setValues(temp);
                                 } else {
                                     console.log(res.body);
                                     handleOpenErrorDialog('客户端' + client_id + '：Ping任务已完成，但无法获取丢包率');
@@ -279,6 +283,7 @@ export default function SpeedTest(props) {
     const checkRouter = (mission_id, client_id, index, mission_type2) => {
         var data1 = { mission_id: mission_id };
         var data2 = { client_id: client_id };
+        var temp;
         IsFinished(data1).then(res => {
             console.log(client_id, 'testing state of router mission...')
             if (res.body.status) {
@@ -290,19 +295,19 @@ export default function SpeedTest(props) {
                         console.log(client_id, 'require the data')
                         if (res.body.status) {
                             var list = [].concat(onlineMachineList);
-                            var values_temp = [].concat(values);
+                            // var values_temp = [].concat(values);
                             // console.log(client_id, mission_type2, res.body.data.client_info[1].value);
-                            preClientId = client_id;
+                            // preClientId = client_id;
                             list[index].routerLoading = false;
-                            values_temp[1].value = res.body.data.client_info[1].value;
-                            preRouter = values_temp[1].value;
-                            setValues(values_temp);
                             setOnlineMachineList(list);
+                            temp = res.body.data.client_info[1].value;
+                            preRouters = temp;
+                            setValues({ ...values, routers: temp });
                         } else {
                             console.log(res.body);
                             handleOpenErrorDialog('客户端' + client_id + '：路由跳数的测试任务已完成，但无法获取该数据');
                         }
-                        dispatch({ type: 'CLOSE_ROUTER' });
+                        // dispatch({ type: 'CLOSE_ROUTER' });
                         clearInterval(document.checkRouterTimerInterval[client_id][mission_type2]);
                     }).catch(err => console.log(err));
                 }
@@ -372,17 +377,17 @@ export default function SpeedTest(props) {
             if (res.body.status) {
                 var mission_id = res.body.data.mission_id; //任务创建成功会收到mission_id
                 preDelayClientId = id;
-                dispatch({ type: 'OPEN_PING' });
+                // dispatch({ type: 'OPEN_PING' });
                 //轮询检查任务是否完成
                 document.checkPingTimerInterval[id][mission_type1] = setInterval(checkPing, 2000, mission_id, id, index, mission_type1);
                 //超时
                 document.pingMissionTimeout[id][mission_type1] = setTimeout(() => {
-                    var list = [].concat(onlineMachineList);
+                    // var list = [].concat(onlineMachineList);
                     list[index].pingLoading = false;
+                    setOnlineMachineList(list);
                     clearInterval(document.checkPingTimerInterval[id][mission_type1]);
                     handleOpenErrorDialog('客户端' + id + '：Ping延迟测试超时');
-                    dispatch({ type: 'CLOSE_PING' });
-                    setOnlineMachineList(list);
+                    // dispatch({ type: 'CLOSE_PING' });
                 }, 70000);
             } else {
                 console.log(res.body); //返回错误信息
@@ -394,17 +399,17 @@ export default function SpeedTest(props) {
         CreateMission(routerData).then(res => {
             if (res.body.status) {
                 var mission_id = res.body.data.mission_id;
-                dispatch({ type: 'OPEN_ROUTER' });
+                // dispatch({ type: 'OPEN_ROUTER' });
                 //轮询检查任务是否完成
                 document.checkRouterTimerInterval[id][mission_type2] = setInterval(checkRouter, 2000, mission_id, id, index, mission_type2);
                 //超时
                 document.routerMissionTimeout[id][mission_type2] = setTimeout(() => {
-                    var list = [].concat(onlineMachineList);
+                    // var list = [].concat(onlineMachineList);
                     list[index].routerLoading = false;
+                    setOnlineMachineList(list);
                     clearInterval(document.checkRouterTimerInterval[id][mission_type2]);
                     handleOpenErrorDialog('客户端' + id + '：路由跳数测试超时');
-                    dispatch({ type: 'CLOSE_ROUTER' });
-                    setOnlineMachineList(list);
+                    // dispatch({ type: 'CLOSE_ROUTER' });
                 }, 75000);
             } else {
                 console.log(res.body); //返回错误信息
@@ -465,7 +470,7 @@ export default function SpeedTest(props) {
                 if (res.body.status) {
                     //任务完成后，结束轮询和超时监听，关闭按钮的环形进度条,
                     if (res.body.data.isDone) {
-                        console.log(client_id, mission_type1, 'Detection of upload speed is done.')
+                        console.log(client_id, mission_type1, 'Detection of upload speed is done.', temp)
                         //关闭按钮上的环形进度条
                         if (mission_type1 == 'upload_mission') {
                             list[index].uploadLoading = false;
@@ -1101,7 +1106,7 @@ export default function SpeedTest(props) {
                 </Grid>
                 <Grid item xs={12} lg={4}>
                     {/* <PingTable values={values} pingLoading={chartLoading.pingTableLoading} routerLoading={chartLoading.routerTableLoading} clientId={preClientId} /> */}
-                    <DelayChart delayData={delayData} clientId={preDelayClientId} />
+                    <DelayChart delayData={delayData} clientId={preDelayClientId} extraData={values}/>
                 </Grid>
             </Grid>
             <Grid container className={classes.dataDisplay}>
