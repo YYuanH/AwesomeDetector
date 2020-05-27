@@ -246,7 +246,7 @@ export default function SpeedTest(props) {
                                     setOnlineMachineList(list);
                                     temp = res.body.data.client_info[0].value;
                                     preLossRate = temp;
-                                    setValues(temp);
+                                    setValues({ ...values, loss_rate: temp });
                                 } else {
                                     console.log(res.body);
                                     handleOpenErrorDialog('客户端' + client_id + '：Ping任务已完成，但无法获取丢包率');
