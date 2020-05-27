@@ -1,4 +1,4 @@
-/*!
+/** 
  *  MyLine Componets
  *  @Params
  *    - data <Required> <Array-type>
@@ -29,6 +29,18 @@ export default class MyLine extends Component {
       timestamp: [],
       dataLegend: [],
       dataList: []
+    }
+  }
+
+  formatter() {
+    return (params, ticket, callback) => {
+      if(!!this.props.extraData) {
+        console.log(params)
+        return `${params[0].seriesName} <br /> 时延：${params[0].value < 1 ? '<1' : params[0].value} (ms) ${Object.keys(this.props.extraData).map(item => `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: ${this.props.extraData[item]}</span>`)}`.replace(/\,/g, "")
+      } else {
+        
+        return `${params[0].seriesName} <br /> 速率：${params[0].value} (Mbps)`
+      }
     }
   }
 
@@ -71,9 +83,6 @@ export default class MyLine extends Component {
                 smooth: true,
                 xAxisIndex: index1,
                 sampling: 'average',
-                // itemStyle: {
-                //     color: this.props.color ? this.props.color : preLineColor[index-1]    // [*] add select color funciton
-                // },
                 center: ['150%', '100%'],
                 areaStyle: {color: 'rgba(0,0,0,0)'} ,
                 emphasis: {
@@ -91,11 +100,6 @@ export default class MyLine extends Component {
           })
         }
 
-        // dataLegend.indexOf(null);
-        // dataLegend.splice(dataLegend.indexOf(null), 1)
-
-        console.log(dataLegend)
-
         this.setState({
           dataLegend: dataLegend,
           finalData: result
@@ -110,6 +114,7 @@ export default class MyLine extends Component {
       case `loss_rate`: return '丢包率'
       case `routers`: return '跳数'
       case 'value': return `客户端 ${this.props.clientId} 传输速度`
+      case 'ping_speed': return `客户端 ${this.props.clientId} 传输时延`
       default: return name
     }
   }
@@ -118,7 +123,7 @@ export default class MyLine extends Component {
     const option = {
       tooltip: {
         trigger: 'axis',
-        formatter: !!this.props.extraData ? `{a} <br/>速度: {c} (Mbps) ${Object.keys(this.props.extraData).map(item => `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: ${this.props.extraData[item]}</span>`)}`.replace(/\,/g, "") : `{a} <br/>速度: {c} (Mbps)`,
+        formatter: this.formatter(),
         backgroundColor: 'rgba(255, 255, 255, 0.86)',
         textStyle: {
           color: '#000',
@@ -133,13 +138,11 @@ export default class MyLine extends Component {
       legend: {
         type: 'scroll',
         data: this.state.dataLegend,
-        // selected: this.props.data.selected
       },
       xAxis: {
         type: 'category',
         axisLine: {
           lineStyle: {
-            // color:'rgba(0, 0, 0, 0.45)'
           }
         },
         boundaryGap: false,
@@ -152,7 +155,6 @@ export default class MyLine extends Component {
         },
         axisLine: {
           lineStyle: {
-          // color:'rgba(0, 0, 0, 0.45)'
         }},
         boundaryGap: [0, '100%']
       },
@@ -194,7 +196,7 @@ export default class MyLine extends Component {
                 shadowBlur: 10,
               }
             },
-            data: this.props.data[item].map(item => (item/1000/1000).toFixed(3))
+            data: item == 'ping_speed' ? this.props.data[item].map(item => parseInt(item)) : this.props.data[item].map(item => (item/1000/1000).toFixed(3))
           };
         }
         return null;
@@ -203,10 +205,7 @@ export default class MyLine extends Component {
     return option;
   }
 
- 
-
   render() {
-
     return (
       <div>
         <ReactEcharts

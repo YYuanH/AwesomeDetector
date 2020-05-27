@@ -25,7 +25,7 @@ export default function DelayChart(props) {
             <Typography color='primary' variant='subtitle1' className={classes.title} >
                 延时
             </Typography>
-            <MyLine data={delayData} style={{ height: cardHeight - 12 }} clientId={clientId} />
+            <MyLine data={delayData} style={{ height: cardHeight - 12 }} clientId={clientId} extraData={{ 'rate_loss': '12%' }} />
         </Paper>
     );
 }
