@@ -36,7 +36,7 @@ export default class MyLine extends Component {
     return (params, ticket, callback) => {
       if(!!this.props.extraData) {
         // console.log(params)
-        return `${params[0].seriesName} <br /> 时延：${params[0].value < 1 ? '<1' : params[0].value} (ms) ${Object.keys(this.props.extraData).map(item => `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: ${this.props.extraData[item]}</span>`)}`.replace(/\,/g, "")
+        return `${params[0].seriesName} <br /> 时延：${params[0].value < 1 ? '<1' : params[0].value} (ms) ${Object.keys(this.props.extraData).map(item => !!this.props.extraData[item] ? `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: ${this.props.extraData[item]}</span>` : `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: Loading.. </span>`)}`.replace(/\,/g, "") 
       } else {
         
         return `${params[0].seriesName} <br /> 速率：${params[0].value} (Mbps)`
