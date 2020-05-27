@@ -47,21 +47,19 @@ const ColorButton = withStyles(theme => ({
 
 export default function AddUser() {
     const classes = useStyles();
-
-
-    {/* 密码可见性切换 */ }
+    //密码可见性切换
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
-    {/* 密码与确认密码不一致提示弹窗 */ }
+    //密码与确认密码不一致提示弹窗 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openPopover = Boolean(anchorEl);
     const handleClosePopover = () => setAnchorEl(null);
-    {/* 添加成功提示弹窗 */ }
+    //添加成功提示弹窗 
     const [openAdded, setOpenAdded] = React.useState(false);
     const handleCloseAdded = () => setOpenAdded(false);
-    {/* 添加失败提示弹窗 */ }
+    //添加失败提示弹窗
     const [openAddFailed, setOpenAddFailed] = React.useState(false);
     const handleCloseAddFailed = () => setOpenAddFailed(false);
 
@@ -75,7 +73,7 @@ export default function AddUser() {
         setValues({ ...values, [name]: event.target.value });
     }
 
-    {/* 增加用户 */ }
+    //增加用户 
     const handleAddUser = (e) => {
         e.preventDefault();
         //判断密码与确认密码是否相同

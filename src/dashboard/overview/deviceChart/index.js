@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
 export default function DeviceChart(props) {
     const classes = useStyles();
     const data = props.value;
-    {/* 将data中的时间戳更改为合适的格式 */}
+    //将data中的时间戳更改为合适的格式
     data.map((item, index) => {
         let dateObj = new Date(item.timestamp);
         let M = (dateObj.getMonth()+1 < 10 ? '0'+(dateObj.getMonth()+1) : dateObj.getMonth()+1) + '-';

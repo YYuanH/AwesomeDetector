@@ -1,5 +1,4 @@
 import React from 'react';
-// import { Popover } from '@material-ui/core';
 import { makeStyles, Typography, TextField, InputAdornment, Button, Popover, Dialog, DialogTitle, DialogActions } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -39,17 +38,17 @@ export default function DelUser() {
     const [username, setUsername] = React.useState('');
     const handleChange = event => setUsername(event.target.value)
 
-    {/* 确认对话框 */}
+    //确认对话框
     const [openDialog, setOpenDialog] = React.useState(false);
     const handleCloseDialog = () => setOpenDialog(false);
-    {/* 删除成功弹窗 */}
+    //删除成功弹窗 
     const [openSuccess, setOpenSuccess] = React.useState(false);
     const handleCloseSuccess = () => setOpenSuccess(false);
-    {/* 删除失败弹窗 */}
+    //删除失败弹窗
     const [openFailed, setOpenFailed] = React.useState(false);
     const handleCloseFailed = () => setOpenFailed(false);
 
-    {/* 删除用户 */}
+    //删除用户
     const handleDelUser = () => {
         let data = {username: username};
         handleCloseDialog();

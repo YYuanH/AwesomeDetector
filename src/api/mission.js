@@ -3,7 +3,7 @@ import { test, testIP } from './serverIP';
 
 const agent = SuperAgent.agent();
 
-{/* 创建任务：SYN UDP SHA，参数：client_id ip mac type (target_client)*/}
+//创建任务：SYN UDP SHA，参数：client_id ip mac type (target_client)
 export function CreateMission(data) {
     let url = "/api/v1/add/mission"
     if(test)
@@ -14,7 +14,7 @@ export function CreateMission(data) {
                 .withCredentials();
 }
 
-{/* 确认任务是否完成，参数：mission_id */}
+//确认任务是否完成，参数：mission_id 
 export function IsFinished(data) {
     let url = '/api/v1/is/mission/done'
     if(test)
@@ -25,7 +25,7 @@ export function IsFinished(data) {
                 .withCredentials();
 }
 
-{/* 请求任务结果 */}
+//请求任务结果
 export function GetResult(data) {
     let url = '/api/v1/get/mission/result';
     if(test)
@@ -36,7 +36,7 @@ export function GetResult(data) {
                 .withCredentials();
 }
 
-{/* 创建UDP任务，参数：client_id, ip, mac, type, duration, speed */}
+//创建UDP任务，参数：client_id, ip, mac, type, duration, speed 
 export function CreateUdpMission(data) {
     let url = "/api/v1/add/mission/udp";
     if(test) url = testIP + url;
@@ -46,7 +46,7 @@ export function CreateUdpMission(data) {
                 .withCredentials();
 }
 
-{/* 创建对任务设备的攻击测试任务，参数：target_id, target_port, type */}
+//创建对任务设备的攻击测试任务，参数：target_id, target_port, type
 export function CreateAttackMission(data) {
     let url = "/api/v1/penetrate";
     if(test) url = testIP + url;

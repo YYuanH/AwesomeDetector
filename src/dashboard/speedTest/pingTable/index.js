@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-{/* 自定义Table的样式*/ }
+//自定义Table的样式
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: '#66bb6a',

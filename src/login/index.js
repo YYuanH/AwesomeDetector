@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControlLabel, Checkbox, Dialog, DialogContent, DialogContentText } from '@material-ui/core';
+import { Dialog, DialogContent, DialogContentText } from '@material-ui/core';
 import { makeStyles, Container, Avatar, Typography, TextField, Button, InputAdornment, IconButton } from '@material-ui/core';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import AccountCircle from '@material-ui/icons/AccountCircle';

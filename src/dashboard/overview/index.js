@@ -27,7 +27,7 @@ export default function Overview(props) {
         let endTime = Date.parse(new Date());
         let startTime = endTime-180000*7;
         let data = { start_time: startTime, end_time: endTime };
-        {/* 获取总览信息 */}
+        //获取总览信息 
         GetOverviewData().then(res => {
             if(res.body.status) {
                 // let data = res.body.data.overview;
@@ -37,7 +37,7 @@ export default function Overview(props) {
                 console.log(res.body);
             }
         }).catch( err => console.log(err) );
-        {/* 获取操作系统信息 */}
+        // 获取操作系统信息
         GetOSNum().then(res => {
             if(res.body.status) {
                 setOsInfo(res.body.data.operation_system);
@@ -46,7 +46,7 @@ export default function Overview(props) {
                 console.log(res.body);
             }
         }).catch( err => console.log(err) );
-        {/* 获取平均上下载速率最快的前五个设备信息 */}
+        // 获取平均上下载速率最快的前五个设备信息 
         GetFiveClients().then(res => {
             if(res.body.status) {
                 setFasterClients(res.body.data.faster_clients);
@@ -55,7 +55,7 @@ export default function Overview(props) {
                 console.log(res.body);
             }
         }).catch( err => console.log(err) );
-        {/* 获取若干时间点的在线设备数量 */}
+        // 获取若干时间点的在线设备数量
         GetDeviceNum(data).then(res => {
             if(res.body.status) {
                 setDeviceNum(res.body.data.online_clients);

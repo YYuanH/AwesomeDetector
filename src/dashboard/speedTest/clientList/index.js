@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, CircularProgress, Collapse } from '@material-ui/core';
-import { makeStyles, Paper, Button, Typography, Divider, Popover } from '@material-ui/core';
+import { makeStyles, Paper, Button, Typography, Divider } from '@material-ui/core';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@material-ui/core';
 import { cyan, green } from '@material-ui/core/colors';
 import Computer from '@material-ui/icons/Computer';
@@ -51,7 +51,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function ClientList(props) {
     const classes = useStyles();
-    const { list, onClickP2PUpload, onClickP2PDownload, onClickPing, onClickTestUploadSpeed, onClickTestDownloadSpeed, onClickUdpUpload, onClickUdpDownload } = props;
+    const { list, onClickP2PUpload, onClickP2PDownload, onClickPing, onClickTestUploadSpeed,  onClickUdpUpload, onClickUdpDownload } = props;
 
     const nestedList = {};
     list.forEach((item, index) => {
@@ -97,17 +97,6 @@ export default function ClientList(props) {
                                         上行测速
                                     </ColorButton>
                                     {item.uploadLoading && <CircularProgress size={22} className={classes.buttonProgress_upDown} />}
-                                    {/* <ColorButton
-                                        size='small'
-                                        variant='contained'
-                                        color='primary'
-                                        disabled={item.downloadLoading}
-                                        className={classes.button}
-                                        onClick={() => onClickTestDownloadSpeed(item.client_id, item.ip, item.mac, index)}
-                                    >
-                                        下行测速
-                                    </ColorButton>                                    
-                                    {item.downloadLoading && <CircularProgress size={22} className={classes.buttonProgress_upDown} />} */}
                                     <ColorButton
                                         size='small'
                                         variant='contained'

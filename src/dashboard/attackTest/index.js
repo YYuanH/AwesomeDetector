@@ -61,7 +61,7 @@ export default function AttackTest(props) {
     const openPopover = Boolean(anchorEl);
     const [popoverStr, setPopoverStr] = React.useState('');
     const [clientList, setClientList] = React.useState(Array);
-    {/* primary表示“安全”，secondary表示“有风险”，default表示“尚未测试” */ }
+    //primary表示“安全”，secondary表示“有风险”，default表示“尚未测试” 
     const [states, setStates] = React.useState(Array);
     const [values, setValues] = React.useState({
         target_ip: '',
@@ -69,9 +69,9 @@ export default function AttackTest(props) {
         type: ''
     })
 
-    {/* 关闭Popover */ }
+    //关闭Popover
     const handleClosePopover = () => setAnchorEl(null);
-    {/* 打开Popover，并显示不同颜色按钮的含义 */ }
+    //打开Popover，并显示不同颜色按钮的含义
     const handleOpenPopover = (event, type) => {
         switch (type) {
             case 'primary':
@@ -80,14 +80,14 @@ export default function AttackTest(props) {
             case 'secondary':
                 setPopoverStr('有风险');
                 break;
-            case 'default':
+            default:
                 setPopoverStr('尚未检测');
                 break;
         }
         setAnchorEl(event.currentTarget);
     }
 
-    {/* 获取客户端列表并初始化按钮状态 */ }
+    //获取客户端列表并初始化按钮状态
     React.useEffect(() => {
         GetList().then(res => {
             if (res.body.status) {
@@ -101,7 +101,7 @@ export default function AttackTest(props) {
                         case 'DANGER':
                             obj_temp.SYN = 'secondary';
                             break;
-                        case 'WAITTING':
+                        default:
                             obj_temp.SYN = 'default';
                             break;
                     };
@@ -112,7 +112,7 @@ export default function AttackTest(props) {
                         case 'DANGER':
                             obj_temp.UDP = 'secondary';
                             break;
-                        case 'WAITTING':
+                        default:
                             obj_temp.UDP = 'default';
                             break;
                     };
@@ -123,7 +123,7 @@ export default function AttackTest(props) {
                         case 'DANGER':
                             obj_temp.SHA = 'secondary';
                             break;
-                        case 'WAITTING':
+                        default:
                             obj_temp.SHA = 'default';
                             break;
                     };
@@ -141,7 +141,7 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err))
     }, [])
 
-    {/* 查询任务状态，任务完成时请求任务结果 */ }
+    //查询任务状态，任务完成时请求任务结果 
     const checking = (mission_id, index, type) => {
         var data = { mission_id: mission_id }
         var id = clientList[index].client_id
@@ -168,7 +168,7 @@ export default function AttackTest(props) {
                                 case 'UDP':
                                     loadingStr = 'udpLoading';
                                     break;
-                                case 'SHA':
+                                default:
                                     loadingStr = 'shaLoading';
                                     break;
                             }
@@ -181,7 +181,7 @@ export default function AttackTest(props) {
                                     states_temp[index][type] = 'secondary';
                                     states_temp[index][loadingStr] = false;
                                     break;
-                                case 'WAITTING':
+                                default:
                                     states_temp[index][type] = 'default';
                                     states_temp[index][loadingStr] = false;
                                     break;
@@ -205,7 +205,7 @@ export default function AttackTest(props) {
                     case 'UDP':
                         states_temp[index].udpLoading = false;
                         break;
-                    case 'SHA':
+                    default:
                         states_temp[index].shaLoading = false;
                         break;
                 }
@@ -218,7 +218,7 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 创建任务并轮询任务结果 */ }
+    //创建任务并轮询任务结果
     const handleClick = (id, ip, mac, type, index) => {
         var data = {
             client_id: id,
@@ -234,7 +234,7 @@ export default function AttackTest(props) {
             case 'UDP':
                 states_temp[index].udpLoading = true;
                 break;
-            case 'SHA':
+            default:
                 states_temp[index].shaLoading = true;
                 break;
         }
@@ -271,7 +271,7 @@ export default function AttackTest(props) {
                         case 'UDP':
                             states_temp[index].udpLoading = false;
                             break;
-                        case 'SHA':
+                        default:
                             states_temp[index].shaLoading = false;
                             break;
                     }
@@ -287,10 +287,10 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 关闭错误警告弹窗 */ }
+    //关闭错误警告弹窗
     const handleCloseErrorDialog = () => { setOpenErrorDialog(false) }
 
-    {/* 打开错误警告弹窗  */ }
+    //打开错误警告弹窗 
     const handleOpenErrorDialog = massege => {
         setMsg(massege);
         setOpenErrorDialog(true);

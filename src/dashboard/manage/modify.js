@@ -42,20 +42,20 @@ const ColorButton = withStyles(theme => ({
 export default function Modify() {
     const classes = useStyles();
 
-    {/* 密码不一致提示弹窗 */}
+    //密码不一致提示弹窗 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClosePopover = () => setAnchorEl(null);
 
-    {/* 修改失败提示弹窗 */}
+    //修改失败提示弹窗 
     const [openModifyFailed, setOpenModiyFailed] = React.useState(false);
     const handleCloseModifyFailed = () => setOpenModiyFailed(false);
     
-    {/* 修改成功提示弹窗 */}
+    //修改成功提示弹窗
     const [openModified, setOpenModified] = React.useState(false);
     const handleCloseModified = () => setOpenModified(false);
 
-    {/* 密码可见性切换 */}
+    //密码可见性切换
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -71,7 +71,7 @@ export default function Modify() {
         setModifying({...modifying, [name]: event.target.value});
     }
 
-    {/* 点击按钮 */}
+    //点击按钮
     const handleModifying = event => {
         event.preventDefault();
         //检查新密码与确认密码是否一致

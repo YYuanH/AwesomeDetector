@@ -1,7 +1,5 @@
-import React, { useReducer } from 'react';
-import { Radio, RadioGroup, FormControlLabel, CircularProgress, TextField, InputAdornment } from '@material-ui/core';
-import { withStyles, Dialog, DialogContent, DialogTitle, DialogActions } from '@material-ui/core';
-import { makeStyles, Container, Button, Grid } from '@material-ui/core';
+import React from 'react';
+import {  makeStyles, Container, Grid } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
 
 import { GetList, GetClientInfo, GetUploadSpeed, GetDownloadSpeed, GetDelay } from '../../api/speedTest';
@@ -9,7 +7,6 @@ import { CreateMission, IsFinished, CreateUdpMission } from '../../api/mission';
 import UploadChart from './uploadChart';
 import DownloadChart from './downloadChart';
 import DelayChart from './delayChart';
-import PingTable from './pingTable';
 import ClientList from './clientList';
 import ErrorDialog from './errorDialog';
 import UdpDialog from './udpDialog';
@@ -65,44 +62,45 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-{/* 自定义按钮 */ }
-const ColorButton = withStyles(theme => ({
-    root: {
-        backgroundColor: cyan[500],
-        '&:hover': {
-            backgroundColor: cyan[700]
-        },
-    },
-}))(Button);
+//自定义按钮
+// const ColorButton = withStyles(theme => ({
+//     root: {
+//         backgroundColor: cyan[500],
+//         '&:hover': {
+//             backgroundColor: cyan[700]
+//         },
+//     },
+// }))(Button);
 
-{/* 控制图表的环形进度条 */ }
-const loadingReducer = (state, action) => {
-    switch (action.type) {
-        // case 'OPEN_UPLOAD':
-        //     return { ...state, uploadChartLoading: true };
-        // case 'OPEN_DOWNLOAD':
-        //     return { ...state, downloadChartLoading: true };
-        case 'OPEN_PING':
-            return { ...state, pingTableLoading: true };
-        case 'OPEN_ROUTER':
-            return { ...state, routerTableLoading: true };
-        // case 'CLOSE_UPLOAD':
-        //     return { ...state, uploadChartLoading: false };
-        // case 'CLOSE_DOWNLOAD':
-        //     return { ...state, downloadChartLoading: false };
-        case 'CLOSE_PING':
-            return { ...state, pingTableLoading: false };
-        case 'CLOSE_ROUTER':
-            return { ...state, routerTableLoading: false };
-    }
-}
+// {/* 控制图表的环形进度条 */ }
+// const loadingReducer = (state, action) => {
+//     switch (action.type) {
+//         // case 'OPEN_UPLOAD':
+//         //     return { ...state, uploadChartLoading: true };
+//         // case 'OPEN_DOWNLOAD':
+//         //     return { ...state, downloadChartLoading: true };
+//         case 'OPEN_PING':
+//             return { ...state, pingTableLoading: true };
+//         case 'OPEN_ROUTER':
+//             return { ...state, routerTableLoading: true };
+//         // case 'CLOSE_UPLOAD':
+//         //     return { ...state, uploadChartLoading: false };
+//         // case 'CLOSE_DOWNLOAD':
+//         //     return { ...state, downloadChartLoading: false };
+//         case 'CLOSE_PING':
+//             return { ...state, pingTableLoading: false };
+//         case 'CLOSE_ROUTER':
+//             return { ...state, routerTableLoading: false };
+//     }
+// }
 
 //4个全局变量用以保存上次的数据
 let preUpData = {};
 let preDownData = {};
 let preDelayData = {};
 let preLossRate, preRouters;
-let preClientId, preClientIdUp, preClientIdDown, preDelayClientId;
+let preClientIdUp, preClientIdDown, preDelayClientId;
+
 
 export default function SpeedTest(props) {
     const classes = useStyles();
@@ -117,9 +115,9 @@ export default function SpeedTest(props) {
 
     const [openErrorDialog, setOpenErrorDialog] = React.useState(false);//报错弹窗
     const [message, setMessage] = React.useState('');//报错信息
-    {/* 关闭错误警告 */ }
+    //关闭错误警告
     const handleCloseErrorDialog = () => setOpenErrorDialog(false);
-    {/* 打开错误警告 */ }
+    //打开错误警告
     const handleOpenErrorDialog = msg => {
         setMessage(msg);
         setOpenErrorDialog(true);
@@ -161,31 +159,24 @@ export default function SpeedTest(props) {
     const [upData, setUpData] = React.useState({});
     const [downData, setDownData] = React.useState({});
     const [delayData, setDelayData] = React.useState({});
-    const [values, setValues] = React.useState({
-        loss_rate: '', //丢包率
-        routers: '' //路由跳数
-    });
+    // const [values, setValues] = React.useState({
+    //     loss_rate: '', //丢包率
+    //     routers: '' //路由跳数
+    // });
 
-    const [chartLoading, dispatch] = useReducer(loadingReducer, {
-        // uploadChartLoading: false,
-        // downloadChartLoading: false,
-        pingTableLoading: false,
-        routerTableLoading: false
-    });
+    // const [chartLoading, dispatch] = useReducer(loadingReducer, {
+    //     // uploadChartLoading: false,
+    //     // downloadChartLoading: false,
+    //     pingTableLoading: false,
+    //     routerTableLoading: false
+    // });
 
-    {/* 获取客户端列表 */ }
-    React.useEffect(() => { 
-        // var values_temp = [].concat(values);
-        // values_temp[0].value = preLossRate;
-        // values_temp[1].value = preRouters;
+    //获取客户端列表
+    React.useEffect(() => {
         setUpData(preUpData);
         setDownData(preDownData);
         setDelayData(preDelayData);
-        setValues({
-            loss_rate: preLossRate,
-            routers: preRouters
-        });
-
+        // setValues({ loss_rate: preLossRate, routers: preRouters });
         GetList().then(res => {
             if (res.body.status) {
                 var temp = res.body.data.clients.map((item, index) => {
@@ -208,7 +199,7 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }, []);
 
-    {/* 查询ping任务状态，任务未完成时不断获取延时数据，任务完成时请求延迟的信息 */ }
+    //查询ping任务状态，任务未完成时不断获取延时数据，任务完成时请求延迟的信息
     const checkPing = (mission_id, client_id, index, mission_type1) => {
         var data1 = { mission_id: mission_id };
         var data2 = { client_id: client_id };
@@ -219,7 +210,6 @@ export default function SpeedTest(props) {
             start_time: start_time,
             end_time: end_time
         }
-        var temp;
         console.log(client_id, 'get data of delay..');
         GetDelay(data_delay).then(res => {
             //成功获取延时数据，并查询任务是否完成，如果完成，请求丢包率
@@ -241,17 +231,17 @@ export default function SpeedTest(props) {
                                 console.log(client_id, 'require the loss_rate..')
                                 if (res.body.status) {
                                     var list = [].concat(onlineMachineList);
-                                    // var values_temp = [].concat(values);
                                     list[index].pingLoading = false;
                                     setOnlineMachineList(list);
                                     temp = res.body.data.client_info[0].value;
                                     preLossRate = temp;
-                                    setValues({ ...values, loss_rate: temp });
+                                    // var tempValues = {...values};
+                                    // tempValues['loss_rate'] = temp;
+                                    // setValues(tempValues);
                                 } else {
                                     console.log(res.body);
                                     handleOpenErrorDialog('客户端' + client_id + '：Ping任务已完成，但无法获取丢包率');
                                 }
-                                dispatch({ type: 'CLOSE_PING' });
                                 //关闭超时监听和轮询
                                 clearInterval(document.checkPingTimerInterval[client_id][mission_type1]);
                             }).catch(err => console.log(err));
@@ -259,7 +249,6 @@ export default function SpeedTest(props) {
                     } else {
                         console.log(res.body);
                         handleOpenErrorDialog('客户端' + client_id + '：无法检测到Ping延迟的测试任务是否完成');
-                        dispatch({ type: 'CLOSE_PING' });
                         clearInterval(document.checkPingTimerInterval[client_id][mission_type1]);
                     }
                 }).catch(err => console.log(err));
@@ -270,16 +259,9 @@ export default function SpeedTest(props) {
                 clearInterval(document.checkPingTimerInterval[client_id][mission_type1]);
             }
         }).catch(err => console.log(err));
-        //     } else {
-        //         console.log(res.body);
-        //         handleOpenErrorDialog('客户端' + client_id + '：无法检测到Ping延迟的测试任务是否完成');
-        //         dispatch({ type: 'CLOSE_PING' });
-        //         clearInterval(document.checkPingTimerInterval[client_id][mission_type1]);
-        //     }
-        // }).catch(err => console.log(err));
     }
 
-    {/* 查询router任务状态，任务完成时请求路由跳的信息 */ }
+    //查询router任务状态，任务完成时请求路由跳的信息
     const checkRouter = (mission_id, client_id, index, mission_type2) => {
         var data1 = { mission_id: mission_id };
         var data2 = { client_id: client_id };
@@ -295,32 +277,29 @@ export default function SpeedTest(props) {
                         console.log(client_id, 'require the data')
                         if (res.body.status) {
                             var list = [].concat(onlineMachineList);
-                            // var values_temp = [].concat(values);
-                            // console.log(client_id, mission_type2, res.body.data.client_info[1].value);
-                            // preClientId = client_id;
                             list[index].routerLoading = false;
                             setOnlineMachineList(list);
                             temp = res.body.data.client_info[1].value;
                             preRouters = temp;
-                            setValues({ ...values, routers: temp });
+                            // var tempValues = {...values};
+                            // tempValues['routers'] = temp;
+                            // setValues(tempValues);
                         } else {
                             console.log(res.body);
                             handleOpenErrorDialog('客户端' + client_id + '：路由跳数的测试任务已完成，但无法获取该数据');
                         }
-                        // dispatch({ type: 'CLOSE_ROUTER' });
                         clearInterval(document.checkRouterTimerInterval[client_id][mission_type2]);
                     }).catch(err => console.log(err));
                 }
             } else {
                 console.log(res.body);
                 handleOpenErrorDialog('客户端' + client_id + '：无法检测到路由跳数的测试任务是否完成');
-                dispatch({ type: 'CLOSE_ROUTER' });
                 clearInterval(document.checkRouterTimerInterval[client_id][mission_type2]);
             }
         }).catch(err => console.log(err));
     }
 
-    {/* 创建测试Ping延迟、丢包率、路由跳数的任务 */ }
+    //创建测试Ping延迟、丢包率、路由跳数的任务
     const handlePing = (id, ip, mac, index) => {
         var pingData = {
             client_id: id,
@@ -377,17 +356,14 @@ export default function SpeedTest(props) {
             if (res.body.status) {
                 var mission_id = res.body.data.mission_id; //任务创建成功会收到mission_id
                 preDelayClientId = id;
-                // dispatch({ type: 'OPEN_PING' });
                 //轮询检查任务是否完成
                 document.checkPingTimerInterval[id][mission_type1] = setInterval(checkPing, 2000, mission_id, id, index, mission_type1);
                 //超时
                 document.pingMissionTimeout[id][mission_type1] = setTimeout(() => {
-                    // var list = [].concat(onlineMachineList);
                     list[index].pingLoading = false;
                     setOnlineMachineList(list);
                     clearInterval(document.checkPingTimerInterval[id][mission_type1]);
                     handleOpenErrorDialog('客户端' + id + '：Ping延迟测试超时');
-                    // dispatch({ type: 'CLOSE_PING' });
                 }, 70000);
             } else {
                 console.log(res.body); //返回错误信息
@@ -399,17 +375,14 @@ export default function SpeedTest(props) {
         CreateMission(routerData).then(res => {
             if (res.body.status) {
                 var mission_id = res.body.data.mission_id;
-                // dispatch({ type: 'OPEN_ROUTER' });
                 //轮询检查任务是否完成
                 document.checkRouterTimerInterval[id][mission_type2] = setInterval(checkRouter, 2000, mission_id, id, index, mission_type2);
                 //超时
                 document.routerMissionTimeout[id][mission_type2] = setTimeout(() => {
-                    // var list = [].concat(onlineMachineList);
                     list[index].routerLoading = false;
                     setOnlineMachineList(list);
                     clearInterval(document.checkRouterTimerInterval[id][mission_type2]);
                     handleOpenErrorDialog('客户端' + id + '：路由跳数测试超时');
-                    // dispatch({ type: 'CLOSE_ROUTER' });
                 }, 75000);
             } else {
                 console.log(res.body); //返回错误信息
@@ -418,13 +391,13 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 点击ping按钮弹出对话框 */ }
+    //点击ping按钮弹出对话框 
     const handleClickPing = id => {
         setId(id);
         setOpenPingDialog(true);
     }
 
-    {/* 点击弹窗按钮，发起Ping任务和Router任务 */ }
+    //点击弹窗按钮，发起Ping任务和Router任务
     const handlePingMission = () => {
         var ip = '';
         var mac = '';
@@ -442,7 +415,7 @@ export default function SpeedTest(props) {
         handlePing(id, ip, mac, temp_index);
     }
 
-    {/* 轮询获取上行速率，并判断任务是否完成 */ }
+    //轮询获取上行速率，并判断任务是否完成
     const checkUpload = (mission_id, client_id, index, mission_type1) => {
         var data = { mission_id: mission_id };
         var end_time = Date.parse(new Date());
@@ -472,7 +445,7 @@ export default function SpeedTest(props) {
                     if (res.body.data.isDone) {
                         console.log(client_id, mission_type1, 'Detection of upload speed is done.', temp)
                         //关闭按钮上的环形进度条
-                        if (mission_type1 == 'upload_mission') {
+                        if (mission_type1 === 'upload_mission') {
                             list[index].uploadLoading = false;
                         } else {
                             list[index].p2pUploadLoading = false;
@@ -491,7 +464,7 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 轮询获取下行速率，并检查任务是否完成 */ }
+    //轮询获取下行速率，并检查任务是否完成
     const checkDownload = (mission_id, client_id, index, mission_type2) => {
         var data1 = { mission_id: mission_id };
         var end_time = Date.parse(new Date());
@@ -521,7 +494,7 @@ export default function SpeedTest(props) {
                     if (res.body.data.isDone) {
                         console.log(client_id, mission_type2, 'Detection of download speed is done.')
                         //关闭环形进度条
-                        if (mission_type2 == 'download_mission') {
+                        if (mission_type2 === 'download_mission') {
                             list[index].downloadLoading = false;
                         } else {
                             list[index].p2pDownloadLoading = false;
@@ -540,13 +513,13 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 点击“上行测速”按钮，打开对话框 */ }
+    //点击“上行测速”按钮，打开对话框
     const handleClickUpload = id => {
         setId(id);
         setOpenUpDialog(true);
     }
 
-    {/* 点击按钮，发起上行测速 */ }
+    //点击按钮，发起上行测速 
     const handleUploadMission = () => {
         var ip = '';
         var mac = '';
@@ -564,7 +537,7 @@ export default function SpeedTest(props) {
         handleTestUploadSpeed(id, ip, mac, temp_index);
     }
 
-    {/* 创建测上行速率的任务 */ }
+    //创建测上行速率的任务
     function handleTestUploadSpeed(id, ip, mac, index, target_id) {
         var upload = {};
         var num = arguments.length; //用于非箭头函数
@@ -663,7 +636,7 @@ export default function SpeedTest(props) {
 
     }
 
-    {/* 创建测下行速率的任务 */ }
+    //创建测下行速率的任务
     function handleTestDownloadSpeed(id, ip, mac, index, target_id) {
         var download = {};
         var num = arguments.length; //用于非箭头函数
@@ -762,7 +735,7 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 选择p2p测速的目标客户端 */ }
+    //选择p2p测速的目标客户端 
     const handleChange = name => event => {
         if (name === 'idTo')
             setIdTo(event.target.value); //event.target.value是字符串类型,所以之后的idTo都会是string
@@ -770,7 +743,7 @@ export default function SpeedTest(props) {
             setParams(event.target.value);
     }
 
-    {/* 点击'P2P上行测速'按钮 */ }
+    //点击'P2P上行测速'按钮 
     const handleClickP2PUpload = (client_id, index) => {
         var list = [].concat(onlineMachineList); //深拷贝
         delete list[index];
@@ -778,7 +751,7 @@ export default function SpeedTest(props) {
         setId(client_id);
         setOpenP2PUpload(true);
     }
-    {/* 点击'P2P下行测速'按钮 */ }
+    //点击'P2P下行测速'按钮
     const handleClickP2PDownload = (client_id, index) => {
         var list = [].concat(onlineMachineList); //深拷贝
         delete list[index];
@@ -787,7 +760,7 @@ export default function SpeedTest(props) {
         setOpenP2PDownload(true);
     }
 
-    {/* 点击“确定”按钮，创建P2P网络上行测速任务 */ }
+    //点击“确定”按钮，创建P2P网络上行测速任务
     const handleP2PUploadTest = () => {
         var ip = '';
         var mac = '';
@@ -804,7 +777,7 @@ export default function SpeedTest(props) {
         //创建测上行速率的任务，并获取上行速率
         handleTestUploadSpeed(id, ip, mac, temp_index, idTo);
     }
-    {/* 点击“确定”按钮，创建P2P网络下行测速任务 */ }
+    //点击“确定”按钮，创建P2P网络下行测速任务
     const handleP2PDownloadTest = () => {
         var ip = '';
         var mac = '';
@@ -822,18 +795,18 @@ export default function SpeedTest(props) {
         handleTestDownloadSpeed(id, ip, mac, temp_index, idTo);
     }
 
-    {/* 点击按钮，打开UDP上行测速对话框 */ }
+    //点击按钮，打开UDP上行测速对话框 
     const handleClickUdpUpload = (client_id) => {
         setId(client_id);
         setOpenUdpUpload(true);
     }
-    {/* 点击按钮，打开UDP行下测速对话框 */ }
+    //点击按钮，打开UDP行下测速对话框
     const handleClickUdpDownload = (client_id) => {
         setId(client_id);
         setOpenUdpDownload(true);
     }
 
-    {/* 轮询UDP上行测速任务是否完成 */ }
+    //轮询UDP上行测速任务是否完成 
     const checkUdpUpload = (mission_id, client_id, index, mission_type1) => {
         const data = { mission_id: mission_id };
         var end_time = Date.parse(new Date());
@@ -877,7 +850,7 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 发起Udp上行测速 */ }
+    //发起Udp上行测速
     const handleTestUdpUploadSpeed = id => {
         var upload = {};
         var index;
@@ -964,7 +937,7 @@ export default function SpeedTest(props) {
 
     }
 
-    {/* 轮询UDP下行测速任务是否完成 */ }
+    //轮询UDP下行测速任务是否完成 
     const checkUdpDownload = (mission_id, client_id, index, mission_type1) => {
         var data = { mission_id: mission_id };
         var end_time = Date.parse(new Date());
@@ -1008,7 +981,7 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    {/* 发起Udp下行测速 */ }
+    //发起Udp下行测速
     const handleTestUdpDownloadSpeed = id => {
         var download = {};
         var index;
@@ -1105,8 +1078,7 @@ export default function SpeedTest(props) {
                     <DownloadChart downData={downData} clientId={preClientIdDown} />
                 </Grid>
                 <Grid item xs={12} lg={4}>
-                    {/* <PingTable values={values} pingLoading={chartLoading.pingTableLoading} routerLoading={chartLoading.routerTableLoading} clientId={preClientId} /> */}
-                    <DelayChart delayData={delayData} clientId={preDelayClientId} extraData={values}/>
+                    <DelayChart delayData={delayData} clientId={preDelayClientId} extraData={{loss_rate: preLossRate, routers: preRouters}} />
                 </Grid>
             </Grid>
             <Grid container className={classes.dataDisplay}>
@@ -1123,11 +1095,8 @@ export default function SpeedTest(props) {
                 </Grid>
             </Grid>
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={message} />
-            {/* Ping任务对话框 */}
             <PingDialog open={openPingDialog} id={id} onClose={handleClosePingDialog} onChange={handleChangeParams} onClick={handlePingMission} />
-            {/* 上行测速对话框 */}
             <UpDialog open={openUpDialog} id={id} onClose={handleCloseUpDialog} onChange={handleChangeParams} onClick={handleUploadMission} />
-            {/* P2P上行测速对话框 */}
             <P2PDialog
                 open={openP2PUpload}
                 id={id}
@@ -1138,7 +1107,6 @@ export default function SpeedTest(props) {
                 onChange={handleChange}
                 onClick={handleP2PUploadTest}
             />
-            {/* P2P下行测速对话框 */}
             <P2PDialog
                 open={openP2PDownload}
                 id={id}
@@ -1149,9 +1117,7 @@ export default function SpeedTest(props) {
                 onChange={handleChange}
                 onClick={handleP2PDownloadTest}
             />
-            {/* UDP上行测速对话框 */}
             <UdpDialog open={openUdpUpload} id={id} type="上行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpUploadSpeed(id)} />
-            {/* UDP下行测速对话框 */}
             <UdpDialog open={openUdpDownload} id={id} type="下行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpDownloadSpeed(id)} />
         </Container>
     );

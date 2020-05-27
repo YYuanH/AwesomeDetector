@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-{/* 自定义按钮 */}
+//自定义按钮
 const ColorButton = withStyles(theme => ({
     root: {
         backgroundColor: cyan[500],
@@ -31,7 +31,7 @@ const ColorButton = withStyles(theme => ({
         },
     },
 }))(Button);
-{/* 自定义表格 */}
+//自定义表格 
 const StyledTableCell = withStyles(theme => ({
     head: {
         backgroundColor: '#66bb6a',
@@ -46,7 +46,7 @@ const StyledTableCell = withStyles(theme => ({
 export default function GetUsers() {
     const classes = useStyles();
     const [users, setUsers] = React.useState(['/']);
-    {/* 请求失败弹窗 */}
+    //请求失败弹窗
     const [openFailed, setOpenFailed] = React.useState(false);
     const handleCloseFailed = () => setOpenFailed(false);
     

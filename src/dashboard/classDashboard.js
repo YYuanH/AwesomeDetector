@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { CssBaseline, AppBar, Toolbar, IconButton, Typography,  Drawer, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { withStyles } from '@material-ui/styles';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -124,7 +124,6 @@ class Dashboard extends React.Component{
         this.props.history.push('/login');
     }
 
-    
     render() {
         const {classes} = this.props;
         const { match, history } = this.props;
@@ -134,14 +133,16 @@ class Dashboard extends React.Component{
         const handleClick = link_url => history.push(link_url);  
         const title = () => {
             switch(window.location.pathname) {
-                case '/dashboard':
-                    return '主页总览';
+                // case '/dashboard':
+                //     return '主页总览';
                 case '/dashboard/attack':
                     return '洪水攻击测试';
                 case '/dashboard/manage':
                     return '用户管理';
                 case '/dashboard/speedtest':
                     return 'QoS测试';
+                default:
+                    return '主页总览';
             }
         };
 

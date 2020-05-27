@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles, Card, CardHeader, CardContent, Divider } from '@material-ui/core';
-import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
+import { ResponsiveContainer } from 'recharts';
 import PropTypes from 'prop-types';
 
 import MyPie from '../../../component/mypie';
@@ -13,20 +13,20 @@ const useStyles = makeStyles(theme => ({
 
 export default function OSChart(props) {
     const classes = useStyles();
-    const colors = ['#00bcd4', '#81c784', '#ffa726', '#ef5350'];
-    const RADIAN = Math.PI / 180; 
     const data = props.value;
-    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-        const x  = cx + radius * Math.cos(-midAngle * RADIAN);
-        const y = cy  + radius * Math.sin(-midAngle * RADIAN);
+    // const colors = ['#00bcd4', '#81c784', '#ffa726', '#ef5350'];
+    // const RADIAN = Math.PI / 180; 
+//     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+//         const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+//         const x  = cx + radius * Math.cos(-midAngle * RADIAN);
+//         const y = cy  + radius * Math.sin(-midAngle * RADIAN);
         
-        return (
-         <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'}	dominantBaseline="central">
-           {`${(percent * 100).toFixed(0)}%`}
-         </text>
-        );
-   };
+//         return (
+//          <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'}	dominantBaseline="central">
+//            {`${(percent * 100).toFixed(0)}%`}
+//          </text>
+//         );
+//    };
 
     return (
         <Card>

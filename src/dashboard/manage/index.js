@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Paper, Typography, TextField, Button, makeStyles, Grid, InputAdornment, IconButton, Divider, Popover } from '@material-ui/core';
+import { Container, Paper,  makeStyles, Grid, Divider } from '@material-ui/core';
 import Modify from './modify';
 import AddUser from './addUser';
 import DelUser from './delUser';
@@ -28,19 +28,16 @@ const useStyles = makeStyles(theme => ({
 
 export default function Manage(props) {
     const classes = useStyles();
+    // const [showPassword, setShowPassword] = React.useState(false);
+    // const handleClickShowPassword = () => {
+    //     setShowPassword(!showPassword);
+    // };
 
-    const [showPassword, setShowPassword] = React.useState(false);
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
-    {/* 删除用户 */ }
-    const [showPassword_2, setShowPassword_2] = React.useState(false);
-    const handleClickShowPassword_2 = () => {
-        setShowPassword_2(!showPassword_2);
-    };
-
-
+    // //删除用户
+    // const [showPassword_2, setShowPassword_2] = React.useState(false);
+    // const handleClickShowPassword_2 = () => {
+    //     setShowPassword_2(!showPassword_2);
+    // };
     return (
         <Container maxWidth='lg' className={classes.container}>
             <Paper>

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles, Paper, Typography } from '@material-ui/core';
 
 import MyLine from '../../../component/myline';
@@ -29,7 +28,3 @@ export default function UploadChart(props) {
         </Paper>
     );
 }
-
-// UploadChart.propTypes = {
-//     upData: PropTypes.object.isRequired
-// };

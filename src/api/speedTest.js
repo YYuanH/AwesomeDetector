@@ -3,7 +3,7 @@ import { test, testIP } from './serverIP';
 
 const agent = request.agent();
 
-{/* 获取在线客户端列表 */}
+//获取在线客户端列表 
 export function GetList() {
     let url = '/api/v1/get/clients';
     if(test)
@@ -14,7 +14,7 @@ export function GetList() {
                 .withCredentials();
 }
 
-{/* 获取指定客户端的路由跳数和丢包率，参数：client_id */}
+//获取指定客户端的路由跳数和丢包率，参数：client_id 
 export function GetClientInfo(data) {
     let url = '/api/v1/get/client/info';
     if(test)
@@ -25,7 +25,7 @@ export function GetClientInfo(data) {
                 .withCredentials();
 }
 
-{/* 获取延时，参数：client_id, start_time, end_time */}
+//获取延时，参数：client_id, start_time, end_time 
 export function GetDelay(data) {
     let url = '/api/v1/get/client/ping';
     if(test)
@@ -36,7 +36,7 @@ export function GetDelay(data) {
                 .withCredentials();
 }
 
-{/* 获取指定客户端的上行速度，参数：client_id start_time end_time */}
+//获取指定客户端的上行速度，参数：client_id start_time end_time 
 export function GetUploadSpeed(data) {
     let url = '/api/v1/get/client/speed/upload';
     if(test)
@@ -47,7 +47,7 @@ export function GetUploadSpeed(data) {
                 .withCredentials();
 }
 
-{/* 获取指定客户端的下行速度，参数：client_id start_time end_time */}
+//获取指定客户端的下行速度，参数：client_id start_time end_time 
 export function GetDownloadSpeed(data) {
     let url = '/api/v1/get/client/speed/download';
     if(test)
