@@ -107,6 +107,8 @@ export default class MyLine extends Component {
   varToReadable = (name) => {
     switch(name) {
       case `timestamp`: return '时间戳'
+      case `loss_rate`: return '丢包率'
+      case `routers`: return '跳数'
       case 'value': return `客户端 ${this.props.clientId} 传输速度`
       default: return name
     }
@@ -116,7 +118,7 @@ export default class MyLine extends Component {
     const option = {
       tooltip: {
         trigger: 'axis',
-        formatter: "{a} <br/>速度: {c} (Mbps)",
+        formatter: !!this.props.extraData ? `{a} <br/>速度: {c} (Mbps) ${Object.keys(this.props.extraData).map(item => `<br/><span style="font-weight: 600; font-color: rgba(0, 0, 0, 0.75)">${this.varToReadable(item)}: ${this.props.extraData[item]}</span>`)}`.replace(/\,/g, "") : `{a} <br/>速度: {c} (Mbps)`,
         backgroundColor: 'rgba(255, 255, 255, 0.86)',
         textStyle: {
           color: '#000',
