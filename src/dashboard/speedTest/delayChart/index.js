@@ -18,7 +18,6 @@ const useStyles = makeStyles(theme => ({
 export default function DelayChart(props) {
     const { delayData, clientId, extraData } = props;
     const classes = useStyles();
-    console.log(extraData)
 
     return (
         <Paper className={classes.paperHeight}>

@@ -98,6 +98,7 @@ const useStyles = makeStyles(theme => ({
 let preUpData = {};
 let preDownData = {};
 let preDelayData = {};
+let preValues = {};
 let preLossRate, preRouters;
 let preClientIdUp, preClientIdDown, preDelayClientId;
 
@@ -162,10 +163,10 @@ export default function SpeedTest(props) {
     const [upData, setUpData] = React.useState({});
     const [downData, setDownData] = React.useState({});
     const [delayData, setDelayData] = React.useState({});
-    // const [values, setValues] = React.useState({
-    //     loss_rate: '', //丢包率
-    //     routers: '' //路由跳数
-    // });
+    const [values, setValues] = React.useState({
+        loss_rate: '', //丢包率
+        routers: '' //路由跳数
+    });
 
     // const [chartLoading, dispatch] = useReducer(loadingReducer, {
     //     // uploadChartLoading: false,
@@ -179,7 +180,7 @@ export default function SpeedTest(props) {
         setUpData(preUpData);
         setDownData(preDownData);
         setDelayData(preDelayData);
-        // setValues({ loss_rate: preLossRate, routers: preRouters });
+        setValues(preValues);
         GetList().then(res => {
             if (res.body.status) {
                 var temp = res.body.data.clients.map((item, index) => {
@@ -236,8 +237,10 @@ export default function SpeedTest(props) {
                                     var list = [].concat(onlineMachineList);
                                     list[index].pingLoading = false;
                                     setOnlineMachineList(list);
-                                    temp = res.body.data.client_info[0].value;
-                                    preLossRate = temp;
+                                    temp = res.body.data.client_info;
+                                    preLossRate = temp.loss_rate;
+                                    preValues = temp;
+                                    setValues(temp);
                                     // var tempValues = {...values};
                                     // tempValues['loss_rate'] = temp;
                                     // setValues(tempValues);
@@ -282,8 +285,10 @@ export default function SpeedTest(props) {
                             var list = [].concat(onlineMachineList);
                             list[index].routerLoading = false;
                             setOnlineMachineList(list);
-                            temp = res.body.data.client_info[1].value;
-                            preRouters = temp;
+                            temp = res.body.data.client_info;
+                            preRouters = temp.routers;
+                            preValues = temp;
+                            setValues(temp);
                             // var tempValues = {...values};
                             // tempValues['routers'] = temp;
                             // setValues(tempValues);
@@ -1082,7 +1087,7 @@ export default function SpeedTest(props) {
                     <DownloadChart downData={downData} clientId={preClientIdDown} />
                 </Grid>
                 <Grid item xs={12} lg={4}>
-                    <DelayChart delayData={delayData} clientId={preDelayClientId} extraData={{loss_rate: preLossRate, routers: preRouters}} />
+                    <DelayChart delayData={delayData} clientId={preDelayClientId} extraData={values} />
                 </Grid>
             </Grid>
             <Grid container className={classes.dataDisplay}>
