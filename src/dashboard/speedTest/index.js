@@ -125,7 +125,7 @@ export default function SpeedTest(props) {
 
     //上行测速对话框
     const [openUpDialog, setOpenUpDialog] = React.useState(false);
-    const [params, setParams] = React.useState(-1);//上行测速参数
+    const [params, setParams] = React.useState('');//上行测速参数
     const handleCloseUpDialog = () => setOpenUpDialog(false);
     const handleChangeParams = event => setParams(event.target.value);
 
@@ -151,6 +151,9 @@ export default function SpeedTest(props) {
     //ping任务对话框
     const [openPingDialog, setOpenPingDialog] = React.useState(false);
     const handleClosePingDialog = () => setOpenPingDialog(false);
+    //ping任务输入参数
+    const [pingParam, setPingParam] = React.useState('');
+    const handleChangePingParam = event => setPingParam(event.target.value);
 
     const [id, setId] = React.useState(-1);
     const [idTo, setIdTo] = React.useState(-1);
@@ -306,14 +309,14 @@ export default function SpeedTest(props) {
             ip: ip,
             mac: mac,
             type: 'PING',
-            params: params
+            params: pingParam
         };
         var routerData = {
             client_id: id,
             ip: ip,
             mac: mac,
             type: 'ROUTER',
-            params: params
+            params: pingParam
         };
         var list = [].concat(onlineMachineList);
         var mission_type1 = 'ping';
@@ -370,7 +373,7 @@ export default function SpeedTest(props) {
                 handleOpenErrorDialog('客户端' + id + '：Ping延迟的测试任务创建失败！')
             }
         }).catch(err => console.log(err));
-
+        
         //创建Router任务
         CreateMission(routerData).then(res => {
             if (res.body.status) {
@@ -388,6 +391,7 @@ export default function SpeedTest(props) {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + id + '：路由跳数的测试任务创建失败！')
             }
+            setPingParam(''); //发起ping和路由跳数任务后清空pingParam的值
         }).catch(err => console.log(err));
     }
 
@@ -1095,7 +1099,7 @@ export default function SpeedTest(props) {
                 </Grid>
             </Grid>
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={message} />
-            <PingDialog open={openPingDialog} id={id} onClose={handleClosePingDialog} onChange={handleChangeParams} onClick={handlePingMission} />
+            <PingDialog open={openPingDialog} id={id} onClose={handleClosePingDialog} onChange={handleChangePingParam} onClick={handlePingMission} />
             <UpDialog open={openUpDialog} id={id} onClose={handleCloseUpDialog} onChange={handleChangeParams} onClick={handleUploadMission} />
             <P2PDialog
                 open={openP2PUpload}
