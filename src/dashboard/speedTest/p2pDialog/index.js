@@ -46,7 +46,7 @@ export default function P2PDialog(props) {
                     //margin="normal"
                     size="small"
                     InputProps={{
-                        endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                        endAdornment: <InputAdornment position="end">Mb</InputAdornment>,
                     }}
                 />
                 <RadioGroup

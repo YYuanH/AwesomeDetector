@@ -62,16 +62,6 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-//自定义按钮
-// const ColorButton = withStyles(theme => ({
-//     root: {
-//         backgroundColor: cyan[500],
-//         '&:hover': {
-//             backgroundColor: cyan[700]
-//         },
-//     },
-// }))(Button);
-
 // {/* 控制图表的环形进度条 */ }
 // const loadingReducer = (state, action) => {
 //     switch (action.type) {
@@ -99,7 +89,7 @@ let preUpData = {};
 let preDownData = {};
 let preDelayData = {};
 let preValues = {};
-let preLossRate, preRouters;
+// let preLossRate, preRouters;
 let preClientIdUp, preClientIdDown, preDelayClientId;
 
 
@@ -238,12 +228,9 @@ export default function SpeedTest(props) {
                                     list[index].pingLoading = false;
                                     setOnlineMachineList(list);
                                     temp = res.body.data.client_info;
-                                    preLossRate = temp.loss_rate;
+                                    // preLossRate = temp.loss_rate;
                                     preValues = temp;
                                     setValues(temp);
-                                    // var tempValues = {...values};
-                                    // tempValues['loss_rate'] = temp;
-                                    // setValues(tempValues);
                                 } else {
                                     console.log(res.body);
                                     handleOpenErrorDialog('客户端' + client_id + '：Ping任务已完成，但无法获取丢包率');
@@ -286,12 +273,9 @@ export default function SpeedTest(props) {
                             list[index].routerLoading = false;
                             setOnlineMachineList(list);
                             temp = res.body.data.client_info;
-                            preRouters = temp.routers;
+                            // preRouters = temp.routers;
                             preValues = temp;
                             setValues(temp);
-                            // var tempValues = {...values};
-                            // tempValues['routers'] = temp;
-                            // setValues(tempValues);
                         } else {
                             console.log(res.body);
                             handleOpenErrorDialog('客户端' + client_id + '：路由跳数的测试任务已完成，但无法获取该数据');

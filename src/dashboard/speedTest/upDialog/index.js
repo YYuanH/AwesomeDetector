@@ -30,7 +30,7 @@ export default function UpDialog(props) {
             fullWidth
             maxWidth = 'sm'
         >
-            <DialogTitle>客户端{id} 上行测速参数：</DialogTitle>
+            <DialogTitle>客户端{id} 吞吐量测试参数：</DialogTitle>
             <DialogContent dividers>
             <TextField
                 required
@@ -42,7 +42,7 @@ export default function UpDialog(props) {
                 variant="outlined"
                 margin="normal"
                 InputProps={{
-                    endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                    endAdornment: <InputAdornment position="end">Mb</InputAdornment>,
                 }}
             />
             </DialogContent>
