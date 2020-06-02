@@ -47,7 +47,7 @@ export default function UpDialog(props) {
             />
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起上行测速</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起测试</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog >
