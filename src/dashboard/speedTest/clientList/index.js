@@ -1,17 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, CircularProgress, Collapse } from '@material-ui/core';
-import { makeStyles, Paper, Button, Typography, Divider } from '@material-ui/core';
+import { withStyles, CircularProgress, Collapse, Tooltip } from '@material-ui/core';
+import { makeStyles, Paper, Button, Typography, Divider, Switch } from '@material-ui/core';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@material-ui/core';
 import { cyan, green } from '@material-ui/core/colors';
+import ErrorDialog from '../errorDialog';
 import Computer from '@material-ui/icons/Computer';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+
+const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+    },
+  }))(Tooltip);
 
 const useStyles = makeStyles(theme => ({
     title: {
         padding: theme.spacing(1),
         fontWeight: 600,
+    },
+    subTitle: {
+        padding: theme.spacing(1),
+        fontWeight: 400,
+        fontSize: '.6em',
+    },
+    padding1: {
+        padding: '.4em',  
+    },
+    padding2: {
+        padding: `.4em .8em`,
+    },
+    notAllowCursor: {
+        cursor: 'not-allowed',
     },
     button: {
         marginRight: theme.spacing(1),
@@ -59,13 +84,32 @@ export default function ClientList(props) {
     })
     //操作嵌套列表
     const [open, setOpen] = React.useState(nestedList);
+    const [switchOpen, setSwitch] = React.useState(false);
     const handleClick = (index) => { setOpen({...open, [index]:!open[index]}) }
-    
-
+    const handleCheck = () => { setSwitch(!switchOpen) }
 
     return (
         <Paper style={{ height: '480px', margin: '10px' }}>
-            <Typography variant='subtitle1' className={classes.title} color='primary'>在线设备</Typography>
+            {/* <ErrorDialog open={true} handleClose={() =>{}} msg={"message"}/> */}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className={classes.padding1}>
+                    <Typography variant='subtitle1' className={classes.title} Gridor='primary'>在线设备</Typography>
+                </div>
+                <HtmlTooltip
+                    title={
+                      <React.Fragment>
+                        <Typography color="inherit">开启测速</Typography>
+                       <b>{'注意：'}</b>您的任何<b>{'不当操作'}</b>都有可能对系统所在网络<b>{'产生危害'}</b>.
+                      </React.Fragment>
+                    }
+                    placement="top"
+                    arrow
+                  >
+                <div className={classes.padding2}>
+                    <Switch checked={switchOpen} onChange={handleCheck}/>
+                </div>
+                </HtmlTooltip>
+            </div>
             <Divider />
             <div style={{ height: '420px', overflowY: 'scroll' }}>              
                 {list.map((item, index) => (
@@ -90,7 +134,7 @@ export default function ClientList(props) {
                                         size='small'
                                         variant='contained'
                                         color='primary'
-                                        disabled={item.uploadLoading}
+                                        disabled={item.uploadLoading || !switchOpen}
                                         className={classes.button}
                                         onClick={() => onClickTestUploadSpeed(item.client_id)}
                                     >
@@ -101,7 +145,7 @@ export default function ClientList(props) {
                                         size='small'
                                         variant='contained'
                                         color='primary'
-                                        disabled={item.udpUploadLoading}
+                                        disabled={item.udpUploadLoading || !switchOpen}
                                         className={classes.button}
                                         onClick={() => onClickUdpUpload(item.client_id)}
                                     >
@@ -112,7 +156,7 @@ export default function ClientList(props) {
                                         size='small'
                                         variant='contained'
                                         color='primary'
-                                        disabled={item.udpDownloadLoading}
+                                        disabled={item.udpDownloadLoading || !switchOpen}
                                         className={classes.button}
                                         onClick={() => onClickUdpDownload(item.client_id)}
                                     >
@@ -123,7 +167,7 @@ export default function ClientList(props) {
                                         size='small'
                                         variant='contained'
                                         color='primary'
-                                        disabled={item.p2pUploadLoading}
+                                        disabled={item.p2pUploadLoading || !switchOpen}
                                         className={classes.button}
                                         onClick={() => onClickP2PUpload(item.client_id, index)}
                                     >
@@ -134,7 +178,7 @@ export default function ClientList(props) {
                                         size='small'
                                         variant='contained'
                                         color='primary'
-                                        disabled={item.p2pDownloadLoading}
+                                        disabled={item.p2pDownloadLoading || !switchOpen}
                                         className={classes.button}
                                         onClick={() => onClickP2PDownload(item.client_id, index)}
                                     >
