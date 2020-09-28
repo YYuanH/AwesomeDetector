@@ -216,7 +216,7 @@ export default function SpeedTest(props) {
                     console.log(client_id, 'testing state of ping mission...')
                     if (res.body.status) {
                         //任务完成后，查询丢包率，终止轮询和超时监听
-                        if (res.body.data.isDone) {
+                        if (res.body.data.is_done) {
                             console.log(client_id, 'ping is done')
                             //终止超时监听
                             clearTimeout(document.pingMissionTimeout[client_id][mission_type1]);
@@ -263,7 +263,7 @@ export default function SpeedTest(props) {
             console.log(client_id, 'testing state of router mission...')
             if (res.body.status) {
                 //任务完成后，请求数据，终止超时检测，终止轮询
-                if (res.body.data.isDone) {
+                if (res.body.data.is_done) {
                     console.log(client_id, 'Router mission is done')
                     clearTimeout(document.routerMissionTimeout[client_id][mission_type2]);
                     GetClientInfo(data2).then(res => {
@@ -408,7 +408,7 @@ export default function SpeedTest(props) {
         handlePing(id, ip, mac, temp_index);
     }
 
-    //轮询获取上行速率，并判断任务是否完成
+    //轮询获取吞吐量上行数据，并判断任务是否完成
     const checkUpload = (mission_id, client_id, index, mission_type1) => {
         var data = { mission_id: mission_id };
         var end_time = Date.parse(new Date());
@@ -424,8 +424,13 @@ export default function SpeedTest(props) {
             if (res.body.status) {
                 console.log(client_id, mission_type1, 'Require the data of upload speed.')
                 temp = res.body.data.upload_speed;
+                //在数组末尾添加空值，以便与下一次测试的数据分隔开
+                // temp.timestamp.push(null);
+                // temp.value.push(null);
+                
                 setUpData(temp);
                 preUpData = temp;
+                console.log(upData);
             } else {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + client_id + '：无法获取上行速率的数据');
@@ -435,7 +440,7 @@ export default function SpeedTest(props) {
                 console.log(client_id, mission_type1, 'Testing task state...')
                 if (res.body.status) {
                     //任务完成后，结束轮询和超时监听，关闭按钮的环形进度条,
-                    if (res.body.data.isDone) {
+                    if (res.body.data.is_done) {
                         console.log(client_id, mission_type1, 'Detection of upload speed is done.', temp)
                         //关闭按钮上的环形进度条
                         if (mission_type1 === 'upload_mission') {
@@ -475,6 +480,7 @@ export default function SpeedTest(props) {
                 var temp = res.body.data.download_speed;
                 setDownData(temp);
                 preDownData = temp;
+                console.log(temp);
             } else {
                 console.log(res.body);
                 handleOpenErrorDialog('客户端' + client_id + '：无法获取下行速率的数据');
@@ -484,7 +490,7 @@ export default function SpeedTest(props) {
                 console.log(client_id, mission_type2, 'Testing state...');
                 if (res.body.status) {
                     //任务完成后，终止轮询和超时监听，关闭环形进度条
-                    if (res.body.data.isDone) {
+                    if (res.body.data.is_done) {
                         console.log(client_id, mission_type2, 'Detection of download speed is done.')
                         //关闭环形进度条
                         if (mission_type2 === 'download_mission') {
@@ -506,13 +512,13 @@ export default function SpeedTest(props) {
         }).catch(err => console.log(err));
     }
 
-    //点击“上行测速”按钮，打开对话框
+    //点击“吞吐量测速”按钮，打开对话框
     const handleClickUpload = id => {
         setId(id);
         setOpenUpDialog(true);
     }
 
-    //点击按钮，发起上行测速 
+    //点击按钮，发起吞吐量测试 
     const handleUploadMission = () => {
         var ip = '';
         var mac = '';
@@ -526,11 +532,11 @@ export default function SpeedTest(props) {
                 return true;
             }
         });
-        //创建测上行速率的任务，并获取上行速率
+        //创建测吞吐量的任务，并获取数据
         handleTestUploadSpeed(id, ip, mac, temp_index);
     }
 
-    //创建测上行速率的任务
+    //创建测吞吐量的任务
     function handleTestUploadSpeed(id, ip, mac, index, target_id) {
         var upload = {};
         var num = arguments.length; //用于非箭头函数
@@ -813,6 +819,9 @@ export default function SpeedTest(props) {
         GetUploadSpeed(data2).then(res => {
             if (res.body.status) {
                 var temp = res.body.data.upload_speed;
+                //在返回的数据末尾追加一个空值，以便隔开下一次的测试数据
+                // temp.timestamp.push(null);
+                // temp.value.push(null);
                 setUpData(temp);
                 preUpData = temp;
                 console.log(client_id, 'Require the data of UDP upload speed...', temp);
@@ -825,7 +834,7 @@ export default function SpeedTest(props) {
                 console.log(client_id, mission_type1, 'Testing state...')
                 if (res.body.status) {
                     //任务完成后，结束轮询和超时监听，关闭环形进度条
-                    if (res.body.data.isDone) {
+                    if (res.body.data.is_done) {
                         console.log(client_id, mission_type1, 'Detection of UDP upload speed is done.')
                         //关闭环形进度条
                         list[index].udpUploadLoading = false;
@@ -947,6 +956,7 @@ export default function SpeedTest(props) {
                 var temp = res.body.data.download_speed;
                 setDownData(temp);
                 preDownData = temp;
+                console.log(temp);
             } else {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + client_id + '：无法获取下行速率的数据');
@@ -956,7 +966,7 @@ export default function SpeedTest(props) {
                 console.log(client_id, mission_type1, 'Testing state...')
                 if (res.body.status) {
                     //任务完成后，结束轮询和超时监听，关闭环形进度条
-                    if (res.body.data.isDone) {
+                    if (res.body.data.is_done) {
                         console.log(client_id, mission_type1, 'Detection of UDP download speed is done.')
                         //关闭环形进度条
                         list[index].udpDownloadLoading = false;

@@ -166,6 +166,7 @@ export default class MyLine extends Component {
     ],
       series: this.props.data ? Object.keys(this.props.data).map((item, index) => {
         if(item !== 'timestamp') {
+          console.log(timeFormat(this.props.data.timestamp), !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1000/1000).toFixed(3) : null))
           return {
             name: this.props.varToReadable ? this.props.varToReadable(item) : this.varToReadable(item),    // [*] add translate function
             type:'line', 
@@ -182,7 +183,7 @@ export default class MyLine extends Component {
                 shadowBlur: 10,
               }
             },
-            data: !!this.props.extraData ? this.props.data[item].map(item => parseInt(item)) : this.props.data[item].map(item => (item/1000/1000).toFixed(3))
+            data: !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1000/1000).toFixed(3) : null)
           };
         }
         return null;
