@@ -407,6 +407,7 @@ export default function AttackTest(props) {
                                     label="发包量"
                                     onChange={handleChange("flood_numbers")}
                                     onMouseOver={handleOpenTextPopover}
+                                    onMouseLeave={handleCloseTextPopover}
                                     onClick={handleCloseTextPopover}
                                     variant="outlined"
                                     margin="normal"
