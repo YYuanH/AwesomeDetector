@@ -46,7 +46,7 @@ export function CreateUdpMission(data) {
                 .withCredentials();
 }
 
-//创建对任务设备的攻击测试任务，参数：target_id, target_port, type
+//创建对任意设备的攻击测试任务，参数：target_id, target_port, type
 export function CreateAttackMission(data) {
     let url = "/api/v1/penetrate";
     if(test) url = testIP + url;

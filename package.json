@@ -5,7 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^4.4.0",
     "@material-ui/icons": "^4.2.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@material-ui/styles": "^4.5.0",
+    "antd": "^4.6.6",
     "clsx": "^1.0.4",
     "echarts": "^4.5.0",
     "echarts-for-react": "^2.0.15-beta.1",

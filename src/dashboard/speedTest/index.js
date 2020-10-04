@@ -1,5 +1,6 @@
 import React from 'react';
-import {  makeStyles, Container, Grid } from '@material-ui/core';
+import { makeStyles, Container, Grid, Snackbar, Button } from '@material-ui/core';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { cyan } from '@material-ui/core/colors';
 
 import { GetList, GetClientInfo, GetUploadSpeed, GetDownloadSpeed, GetDelay } from '../../api/speedTest';
@@ -13,6 +14,7 @@ import UdpDialog from './udpDialog';
 import P2PDialog from './p2pDialog';
 import UpDialog from './upDialog';
 import PingDialog from './pingDialog';
+
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -145,6 +147,17 @@ export default function SpeedTest(props) {
     //ping任务输入参数
     const [pingParam, setPingParam] = React.useState('');
     const handleChangePingParam = event => setPingParam(event.target.value);
+    //ping任务正常结束后，打开Snackbar消息条，显示相关信息
+    const [snackbarState, setSnackbarState] = React.useState({
+        open: false,
+        msg: 'testing',
+    });
+    //关闭Snackbar中的Alert信息
+    const handleCloseAlert = (event, reason) => {
+        if( reason === "clickaway" )
+            return;
+        setSnackbarState({ ...snackbarState, open: false });
+    }
 
     const [id, setId] = React.useState(-1);
     const [idTo, setIdTo] = React.useState(-1);
@@ -218,6 +231,10 @@ export default function SpeedTest(props) {
                         //任务完成后，查询丢包率，终止轮询和超时监听
                         if (res.body.data.is_done) {
                             console.log(client_id, 'ping is done')
+                            setSnackbarState({
+                                open: true,
+                                msg: res.body.data.status_detail,
+                            });
                             //终止超时监听
                             clearTimeout(document.pingMissionTimeout[client_id][mission_type1]);
                             //请求丢包率
@@ -362,7 +379,7 @@ export default function SpeedTest(props) {
                 handleOpenErrorDialog('客户端' + id + '：Ping延迟的测试任务创建失败！')
             }
         }).catch(err => console.log(err));
-        
+
         //创建Router任务
         CreateMission(routerData).then(res => {
             if (res.body.status) {
@@ -424,10 +441,6 @@ export default function SpeedTest(props) {
             if (res.body.status) {
                 console.log(client_id, mission_type1, 'Require the data of upload speed.')
                 temp = res.body.data.upload_speed;
-                //在数组末尾添加空值，以便与下一次测试的数据分隔开
-                // temp.timestamp.push(null);
-                // temp.value.push(null);
-                
                 setUpData(temp);
                 preUpData = temp;
                 console.log(upData);
@@ -819,9 +832,6 @@ export default function SpeedTest(props) {
         GetUploadSpeed(data2).then(res => {
             if (res.body.status) {
                 var temp = res.body.data.upload_speed;
-                //在返回的数据末尾追加一个空值，以便隔开下一次的测试数据
-                // temp.timestamp.push(null);
-                // temp.value.push(null);
                 setUpData(temp);
                 preUpData = temp;
                 console.log(client_id, 'Require the data of UDP upload speed...', temp);
@@ -1122,6 +1132,14 @@ export default function SpeedTest(props) {
             />
             <UdpDialog open={openUdpUpload} id={id} type="上行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpUploadSpeed(id)} />
             <UdpDialog open={openUdpDownload} id={id} type="下行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpDownloadSpeed(id)} />
+            {/* <Button onClick={ ()=> setSnackbarState({...snackbarState, open:true}) }>Alert</Button> */}
+            {/* Ping任务完成时，在屏幕上方正中央，展示消息条 */}
+            <Snackbar open={snackbarState.open} anchorOrigin={{ vertical:'top', horizontal:'center' }}>
+                <Alert severity='success' variant='filled' onClose={handleCloseAlert}>
+                    <AlertTitle>Ping任务已完成,状态详细信息如下：</AlertTitle>
+                    {snackbarState.msg}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

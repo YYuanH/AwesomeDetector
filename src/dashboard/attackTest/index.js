@@ -9,6 +9,7 @@ import ComputerIcon from '@material-ui/icons/Computer';
 import { GetList } from '../../api/speedTest';
 import { CreateMission, IsFinished, GetResult, CreateAttackMission } from '../../api/mission';
 import ErrorDialog from '../speedTest/errorDialog';
+import FloodDialog from './floodDialog';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -23,11 +24,12 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(2),
     },
     attack_button: {
-        marginLeft: theme.spacing(9),
-        marginTop: theme.spacing(3)
+        // marginLeft: theme.spacing(9),
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
     },
     text: {
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
     },
     popover: {
         pointerEvents: 'none',
@@ -41,6 +43,12 @@ const useStyles = makeStyles(theme => ({
         zIndex: 1,
         top: '23%',
         marginLeft: theme.spacing(-10),
+    },
+    //令Grid中的按钮居中显示：Grid是包含按钮的容器，故在容器之上使用flex布局，作用于容器内部的元素
+    box: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
     },
 }));
 
@@ -66,12 +74,20 @@ export default function AttackTest(props) {
     const [values, setValues] = React.useState({
         target_ip: '',
         target_port: '',
-        type: ''
+        type: '',
+        flood_numbers: '',
     })
 
-    //关闭Popover
+    //以下变量用以记录点击SYN、UDP洪水攻击时的客户端各项数据
+    const [id, setId] = React.useState(-1);
+    const [floodType, setFloodType] = React.useState('');
+    var ip = '';
+    var mac = '';
+    var cIndex = -1;
+
+    //关闭三个攻击按钮上的Popover
     const handleClosePopover = () => setAnchorEl(null);
-    //打开Popover，并显示不同颜色按钮的含义
+    //打开三个攻击按钮上的Popover，并显示不同颜色按钮的含义
     const handleOpenPopover = (event, type) => {
         switch (type) {
             case 'primary':
@@ -87,7 +103,49 @@ export default function AttackTest(props) {
         setAnchorEl(event.currentTarget);
     }
 
-    //获取客户端列表并初始化按钮状态
+
+    //点击SYN、UDP供水攻击按钮
+    const handleClickSynUdp = (clientId, clientIP, clientMAC, synUdpType, clientIndex) => {
+        setId(clientId);
+        ip = clientIP;
+        mac = clientMAC;
+        setFloodType(synUdpType);
+        cIndex = clientIndex;
+        handleOpenSynUdp(); //打开弹窗
+
+    }
+
+    //SYN/UDP攻击弹窗的开启关闭状态
+    const [openSynUdp, setOpenSynUdp] = React.useState(false);
+    //开启弹窗
+    const handleOpenSynUdp = () => { setOpenSynUdp(true); }
+    //关闭弹窗
+    const handleCloseSynUdp = () => { setOpenSynUdp(false); }
+
+
+    //SYN、UDP洪水攻击弹窗中，输入的发包量
+    const [packNum, setPackNum] = React.useState('');
+    //输入改变
+    const handleChangePackNum = () => event => { setPackNum(event.tartget.value) }
+
+
+    //关闭错误警告弹窗
+    const handleCloseErrorDialog = () => { setOpenErrorDialog(false) }
+    //打开错误警告弹窗 
+    const handleOpenErrorDialog = massege => {
+        setMsg(massege);
+        setOpenErrorDialog(true);
+    }
+
+
+    {/* 鼠标悬停在发包量输入框上时，出现Popover提示信息 */}
+    const [textAnchorEl, setTextAnchorEl] = React.useState(null);
+    const openTextPopover = Boolean(textAnchorEl);
+    const handleOpenTextPopover = event => setTextAnchorEl(event.currentTarget);
+    const handleCloseTextPopover = () => setTextAnchorEl(null);
+
+
+    {/** 获取客户端列表并初始化按钮状态 */ }
     React.useEffect(() => {
         GetList().then(res => {
             if (res.body.status) {
@@ -141,7 +199,7 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err))
     }, [])
 
-    //查询任务状态，任务完成时请求任务结果 
+    {/** 查询任务状态，任务完成时请求任务结果 */ }
     const checking = (mission_id, index, type) => {
         var data = { mission_id: mission_id }
         var id = clientList[index].client_id
@@ -218,13 +276,14 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err));
     }
 
-    //创建任务并轮询任务结果
+    {/** 创建任务并轮询任务结果 */ }
     const handleClick = (id, ip, mac, type, index) => {
         var data = {
             client_id: id,
             ip: ip,
             mac: mac,
-            type: type
+            type: type,
+            params: packNum,
         };
         var states_temp = [].concat(states);
         switch (type) {
@@ -287,19 +346,11 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err));
     }
 
-    //关闭错误警告弹窗
-    const handleCloseErrorDialog = () => { setOpenErrorDialog(false) }
-
-    //打开错误警告弹窗 
-    const handleOpenErrorDialog = massege => {
-        setMsg(massege);
-        setOpenErrorDialog(true);
-    }
-
+    {/** 提交表单，发起对任意客户端的攻击 */ }
     const handleSubmit = e => {
         e.preventDefault();
         CreateAttackMission(values).then(res => {
-            if(!res.body.status) {
+            if (!res.body.status) {
                 console.log(res.body);
                 handleOpenErrorDialog("攻击测试任务创建失败！");
             } else {
@@ -309,12 +360,13 @@ export default function AttackTest(props) {
     }
 
     const handleChange = name => event => {
-        if (name === 'target_ip')
-            setValues({ ...values, [name]: event.target.value })
-        else if (name === "target_port")
-            setValues({ ...values, [name]: event.target.value })
-        else
-            setValues({ ...values, [name]: event.target.value })
+        // if (name === 'target_ip')
+        //     setValues({ ...values, [name]: event.target.value })
+        // else if (name === "target_port")
+        //     setValues({ ...values, [name]: event.target.value })
+        // else
+        //     setValues({ ...values, [name]: event.target.value })
+        setValues({ ...values, [name]: event.target.value })
     }
 
 
@@ -325,39 +377,54 @@ export default function AttackTest(props) {
                 <Grid item xs={12} lg={12}>
                     <Paper>
                         <form onSubmit={handleSubmit}>
-                            <Typography variant='subtitle1' color='primary' className={classes.title}>
-                                指定设备洪水攻击测试
-                            </Typography>
-                            <Divider />
-                            <TextField
-                                required
-                                className={classes.text}
-                                id="ip"
-                                label="IP地址"
-                                onChange={handleChange("target_ip")}
-                                variant="outlined"
-                                margin="normal"
-                            />
-                            <TextField
-                                required
-                                className={classes.text}
-                                id="port"
-                                label="端口"
-                                onChange={handleChange("target_port")}
-                                variant="outlined"
-                                margin="normal"
-                            />
-                            <FormControl className={classes.text}>
-                                <FormLabel>攻击类型：</FormLabel>
-                                <RadioGroup row value={values.type} onChange={handleChange('type')}>
-                                    <FormControlLabel value='SYN' label="SYN洪水" control={<Radio />} />
-                                    <FormControlLabel value='UDP' label="UDP洪水" control={<Radio />} />
-                                    <FormControlLabel value='SHA' label="HTTP长连接" control={<Radio />} />
-                                </RadioGroup>
-                            </FormControl>
-                            <Button type='submit' variant='contained' color='primary' className={classes.attack_button}>
-                                发起攻击测试
-                            </Button>
+                            <Grid item lg={12}>
+                                <Typography variant='subtitle1' color='primary' className={classes.title}>
+                                    指定设备洪水攻击测试
+                                </Typography>
+                                <Divider />
+                                <TextField
+                                    required
+                                    className={classes.text}
+                                    id="ip"
+                                    label="IP地址"
+                                    onChange={handleChange("target_ip")}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <TextField
+                                    required
+                                    className={classes.text}
+                                    id="port"
+                                    label="端口"
+                                    onChange={handleChange("target_port")}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <TextField
+                                    required
+                                    className={classes.text}
+                                    id="flood-numbers"
+                                    label="发包量"
+                                    onChange={handleChange("flood_numbers")}
+                                    onMouseOver={handleOpenTextPopover}
+                                    onClick={handleCloseTextPopover}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <FormControl className={classes.text}>
+                                    <FormLabel>攻击类型：</FormLabel>
+                                    <RadioGroup row value={values.type} onChange={handleChange('type')}>
+                                        <FormControlLabel value='SYN' label="SYN洪水" control={<Radio />} />
+                                        <FormControlLabel value='UDP' label="UDP洪水" control={<Radio />} />
+                                        <FormControlLabel value='SHA' label="HTTP长连接" control={<Radio />} />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Grid>
+                            <Grid item lg={12} className={classes.box}>
+                                <Button type='submit' variant='contained' color='primary' className={classes.attack_button}>
+                                    发起攻击测试
+                                </Button>
+                            </Grid>
                         </form>
                     </Paper>
                 </Grid>
@@ -385,7 +452,7 @@ export default function AttackTest(props) {
                                                     variant='contained'
                                                     color={states[index].SYN}
                                                     className={classes.button}
-                                                    onClick={() => handleClick(item.client_id, item.ip, item.mac, 'SYN', index)}
+                                                    onClick={() => handleClickSynUdp(item.client_id, item.ip, item.mac, 'SYN', index)}
                                                     onMouseEnter={(event) => handleOpenPopover(event, states[index].SYN)}
                                                     onMouseLeave={handleClosePopover}
                                                     disabled={states[index].synLoading}
@@ -397,7 +464,7 @@ export default function AttackTest(props) {
                                                     variant='contained'
                                                     color={states[index].UDP}
                                                     className={classes.button}
-                                                    onClick={() => handleClick(item.client_id, item.ip, item.mac, 'UDP', index)}
+                                                    onClick={() => handleClickSynUdp(item.client_id, item.ip, item.mac, 'UDP', index)}
                                                     onMouseEnter={(event) => { handleOpenPopover(event, states[index].UDP) }}
                                                     onMouseLeave={handleClosePopover}
                                                     disabled={states[index].udpLoading}
@@ -426,7 +493,7 @@ export default function AttackTest(props) {
                     </Paper>
                 </Grid>
             </Grid>
-
+            {/* 鼠标移动到三个攻击按钮上时出现消息提示 */}
             <Popover
                 classes={{ paper: classes.popoverPaper }}
                 className={classes.popover}
@@ -439,6 +506,33 @@ export default function AttackTest(props) {
                     {popoverStr}
                 </Typography>
             </Popover>
+            {/* 鼠标悬停在发包量输入框上时，出现Popover消息提示 */}
+            <Popover
+                className={classes.popover}
+                open={openTextPopover}
+                anchorEl={textAnchorEl}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center'
+                }}
+            >
+                <Typography variant="subtitle2" className={classes.text}>
+                    发起攻击测试:<br/>此操作属<b>危险操作</b>，请确认<b>发包量</b>填写无误！
+                </Typography>
+            </Popover>
+            {/* SYN、UDP洪水测试的弹窗，用以输入发包量 */}
+            <FloodDialog
+                open={openSynUdp}
+                id={id}
+                type={floodType}
+                onChange={handleChangePackNum}
+                onClose={handleCloseSynUdp}
+                onClick={() => handleClick(id, ip, mac, floodType, cIndex)}
+            />
         </Container>
     );
 }
