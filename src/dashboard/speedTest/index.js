@@ -171,12 +171,6 @@ export default function SpeedTest(props) {
         routers: '' //路由跳数
     });
 
-    // const [chartLoading, dispatch] = useReducer(loadingReducer, {
-    //     // uploadChartLoading: false,
-    //     // downloadChartLoading: false,
-    //     pingTableLoading: false,
-    //     routerTableLoading: false
-    // });
 
     //获取客户端列表
     React.useEffect(() => {
@@ -373,7 +367,7 @@ export default function SpeedTest(props) {
                     setOnlineMachineList(list);
                     clearInterval(document.checkPingTimerInterval[id][mission_type1]);
                     handleOpenErrorDialog('客户端' + id + '：Ping延迟测试超时');
-                }, 70000);
+                }, 140000);
             } else {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + id + '：Ping延迟的测试任务创建失败！')
@@ -392,7 +386,7 @@ export default function SpeedTest(props) {
                     setOnlineMachineList(list);
                     clearInterval(document.checkRouterTimerInterval[id][mission_type2]);
                     handleOpenErrorDialog('客户端' + id + '：路由跳数测试超时');
-                }, 75000);
+                }, 150000);
             } else {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + id + '：路由跳数的测试任务创建失败！')
@@ -638,7 +632,7 @@ export default function SpeedTest(props) {
                             handleOpenErrorDialog('客户端' + id + '：获取上行速率的历史数据失败');
                         }
                     }).catch(err => console.log(err));
-                }, 40000);
+                }, 80000);
 
             } else {
                 console.log(res.body) //输出错误信息
@@ -739,7 +733,7 @@ export default function SpeedTest(props) {
                             handleOpenErrorDialog('客户端' + id + '：获取下行速率的历史数据失败');
                         }
                     }).catch(err => console.log(err));
-                }, 50000);
+                }, 100000);
             } else {
                 console.log(res.body);
                 handleOpenErrorDialog('客户端' + id + '：下行速率测试任务创建失败');
@@ -868,7 +862,7 @@ export default function SpeedTest(props) {
         var index;
         var list = [].concat(onlineMachineList);
         var mission_type1;
-        var expireTime = (udpProps.duration + 10) * 1000;
+        var expireTime = (udpProps.duration + 10) * 1000 * 2;
         //关闭对话框
         handleCloseUdpDialog();
         //创建测上行速率所需的参数
@@ -1000,7 +994,7 @@ export default function SpeedTest(props) {
         var index;
         var list = [].concat(onlineMachineList);
         var mission_type1;
-        var expireTime = (udpProps.duration + 10) * 1000;
+        var expireTime = (udpProps.duration + 10) * 1000 * 2;
         //关闭对话框
         handleCloseUdpDialog();
         //创建测下行速率所需的参数
