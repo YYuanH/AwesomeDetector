@@ -79,11 +79,18 @@ export default function AttackTest(props) {
     })
 
     //以下变量用以记录点击SYN、UDP洪水攻击时的客户端各项数据
-    const [id, setId] = React.useState(-1);
-    const [floodType, setFloodType] = React.useState('');
-    var ip = '';
-    var mac = '';
-    var cIndex = -1;
+    // const [id, setId] = React.useState(-1);
+    // const [floodType, setFloodType] = React.useState('');
+    // var ip = '';
+    // var mac = '';
+    // var cIndex = -1;
+    const [synUdpStates, setSynUdpStates] = React.useState({
+        id: -1,
+        ip: '',
+        mac: '',
+        index: -1,
+        type: '',
+    });
 
     //关闭三个攻击按钮上的Popover
     const handleClosePopover = () => setAnchorEl(null);
@@ -106,11 +113,13 @@ export default function AttackTest(props) {
 
     //点击SYN、UDP供水攻击按钮
     const handleClickSynUdp = (clientId, clientIP, clientMAC, synUdpType, clientIndex) => {
-        setId(clientId);
-        ip = clientIP;
-        mac = clientMAC;
-        setFloodType(synUdpType);
-        cIndex = clientIndex;
+        setSynUdpStates({
+            id: clientId,
+            ip: clientIP,
+            mac: clientMAC,
+            index: clientIndex,
+            type: synUdpType,
+        });
         handleOpenSynUdp(); //打开弹窗
 
     }
@@ -126,7 +135,7 @@ export default function AttackTest(props) {
     //SYN、UDP洪水攻击弹窗中，输入的发包量
     const [packNum, setPackNum] = React.useState('');
     //输入改变
-    const handleChangePackNum = () => event => { setPackNum(event.tartget.value) }
+    const handleChangePackNum = event => { setPackNum(event.target.value) }
 
 
     //关闭错误警告弹窗
@@ -138,7 +147,7 @@ export default function AttackTest(props) {
     }
 
 
-    {/* 鼠标悬停在发包量输入框上时，出现Popover提示信息 */}
+    {/* 鼠标悬停在发包量输入框上时，出现Popover提示信息 */ }
     const [textAnchorEl, setTextAnchorEl] = React.useState(null);
     const openTextPopover = Boolean(textAnchorEl);
     const handleOpenTextPopover = event => setTextAnchorEl(event.currentTarget);
@@ -208,7 +217,7 @@ export default function AttackTest(props) {
             console.log(clientList[index].client_id, mission_id, type, 'Checking the state ...');
             if (res.body.status) {
                 //任务完成时，请求数据，终止超时检测，终止轮询
-                if (res.body.data.isDone) {
+                if (res.body.data.is_done) {
                     console.log(clientList[index].client_id, mission_id, type, 'Misstion is done.');
                     //终止超时监听
                     clearTimeout(document.attackTestTimeout[id][type]);
@@ -286,6 +295,7 @@ export default function AttackTest(props) {
             params: packNum,
         };
         var states_temp = [].concat(states);
+        handleCloseSynUdp();
         switch (type) {
             case 'SYN':
                 states_temp[index].synLoading = true;
@@ -372,6 +382,7 @@ export default function AttackTest(props) {
 
     return (
         <Container maxWidth='lg' className={classes.container}>
+            {console.log(synUdpStates)}
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={msg} />
             <Grid container spacing={4}>
                 <Grid item xs={12} lg={12}>
@@ -522,17 +533,17 @@ export default function AttackTest(props) {
                 }}
             >
                 <Typography variant="subtitle2" className={classes.text}>
-                    发起攻击测试:<br/>此操作属<b>危险操作</b>，请确认<b>发包量</b>填写无误！
+                    发起攻击测试:<br />此操作属<b>危险操作</b>，请确认<b>发包量</b>填写无误！
                 </Typography>
             </Popover>
             {/* SYN、UDP洪水测试的弹窗，用以输入发包量 */}
             <FloodDialog
                 open={openSynUdp}
-                id={id}
-                type={floodType}
+                id={synUdpStates.id}
+                type={synUdpStates.type}
                 onChange={handleChangePackNum}
                 onClose={handleCloseSynUdp}
-                onClick={() => handleClick(id, ip, mac, floodType, cIndex)}
+                onClick={() => handleClick(synUdpStates.id, synUdpStates.ip, synUdpStates.mac, synUdpStates.type, synUdpStates.index)}
             />
         </Container>
     );

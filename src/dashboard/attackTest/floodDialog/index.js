@@ -51,7 +51,7 @@ export default function FloodDialog(props) {
                     className={classes.space}
                     id="package-number"
                     label="发包量"
-                    onChange={onChange()}
+                    onChange={onChange}
                     variant="outlined"
                     margin="normal"
                 // InputProps={{
@@ -84,8 +84,6 @@ export default function FloodDialog(props) {
                     vertical: 'bottom',
                     horizontal: 'center'
                 }}
-                // onClose={handleClosePopover}
-                // disableRestoreFocus
             >
                 <Typography variant="subtitle2" className={classes.typography}>
                     发起{type}洪水攻击测试:<br/>此操作属<b>危险操作</b>，请<b>确认无误</b>再发起！
