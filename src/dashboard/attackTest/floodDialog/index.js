@@ -44,7 +44,7 @@ export default function FloodDialog(props) {
         >
             <DialogTitle>客户端{id} 针对{type}洪水攻击的发包数量：</DialogTitle>
             <DialogContent dividers>
-                <Typography color="primary">此操作属于危险操作，请谨慎填写发包数量！</Typography>
+                <Typography color="primary">请谨慎填写发包数量，当客户端检测到的包数量大于或等于100时，将上报“有风险”状态！</Typography>
                 <TextField
                     required
                     autoFocus
@@ -54,9 +54,6 @@ export default function FloodDialog(props) {
                     onChange={onChange}
                     variant="outlined"
                     margin="normal"
-                // InputProps={{
-                //     endAdornment: <InputAdornment position="end">秒</InputAdornment>,
-                // }}
                 />
             </DialogContent>
             <DialogActions>
