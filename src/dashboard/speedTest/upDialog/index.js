@@ -21,7 +21,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function UpDialog(props) {
     const classes = useStyles();
-    const { open, id, onClose, onChange, onClick } = props;
+    const { open, id, err, errMsg, disable, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -35,6 +35,8 @@ export default function UpDialog(props) {
             <TextField
                 required
                 autoFocus
+                error={err}
+                helperText={errMsg}
                 className={classes.space}
                 id="params"
                 label="测速数据"
@@ -47,7 +49,7 @@ export default function UpDialog(props) {
             />
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起测试</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick} disabled={disable}>发起测试</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog >
@@ -56,6 +58,9 @@ export default function UpDialog(props) {
 
 UpDialog.propTypes = {
     open: PropTypes.bool,
+    err: PropTypes.bool,
+    errMsg: PropTypes.string,
+    disable: PropTypes.bool,
     id: PropTypes.number,
     onClose: PropTypes.func,
     onChange: PropTypes.func,

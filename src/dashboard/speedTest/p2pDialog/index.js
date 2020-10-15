@@ -43,7 +43,7 @@ export default function P2PDialog(props) {
                     label="测速数据"
                     onChange={onChange('param')}
                     variant="outlined"
-                    //margin="normal"
+                    // helperText="test"
                     size="small"
                     InputProps={{
                         endAdornment: <InputAdornment position="end">Mb</InputAdornment>,

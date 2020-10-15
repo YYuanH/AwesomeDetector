@@ -137,6 +137,7 @@ export default function AddUser() {
                 <FormControl className={classes.formControl}>
                     <InputLabel htmlFor="identity" >用户类型</InputLabel>
                     <Select
+                        native
                         value={values.identity}
                         onChange={handleChange('identity')}
                         inputProps={{
@@ -144,8 +145,11 @@ export default function AddUser() {
                             id: 'identity',
                         }}
                     >
-                        <MenuItem value='root'>root</MenuItem>
-                        <MenuItem value='admin'>admin</MenuItem>
+                        {/* <MenuItem value='root'>root</MenuItem>
+                        <MenuItem value='admin'>admin</MenuItem> */}
+                        <option value='' />
+                        <option value='root'>Root</option>
+                        <option value='admin'>Administrator</option>
                     </Select>
                 </FormControl>
                 <TextField

@@ -160,13 +160,13 @@ export default class MyLine extends Component {
       },
       dataZoom: [{
         type: 'inside',
-        start: 0,
+        start: !!this.props.data.timestamp ? (100 - (Math.floor(2000 / this.props.data.timestamp.length))) : 0,
         end: 100
       }, 
     ],
       series: this.props.data ? Object.keys(this.props.data).map((item, index) => {
         if(item !== 'timestamp') {
-          console.log(timeFormat(this.props.data.timestamp), !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1000/1000).toFixed(3) : null))
+          // console.log(timeFormat(this.props.data.timestamp), !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1000/1000).toFixed(3) : null))
           return {
             name: this.props.varToReadable ? this.props.varToReadable(item) : this.varToReadable(item),    // [*] add translate function
             type:'line', 

@@ -15,6 +15,7 @@ import P2PDialog from './p2pDialog';
 import UpDialog from './upDialog';
 import PingDialog from './pingDialog';
 
+import isNumber from '../../utils/isNumber';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -116,11 +117,16 @@ export default function SpeedTest(props) {
         setOpenErrorDialog(true);
     }
 
-    //上行测速对话框
+
+    //吞吐量上行测速对话框
     const [openUpDialog, setOpenUpDialog] = React.useState(false);
-    const [params, setParams] = React.useState('');//上行测速参数
+    const [params, setParams] = React.useState(-1); //吞吐量上行测速参数 || P2P输入框参数
     const handleCloseUpDialog = () => setOpenUpDialog(false);
-    const handleChangeParams = event => setParams(event.target.value);
+    const handleChangeParams = event => {
+        setParams(event.target.value);
+        isErr();
+    }
+
 
     //UDP任务对话框
     const [openUdpUpload, setOpenUdpUpload] = React.useState(false); //UDP上行测速任务对话框
@@ -139,7 +145,9 @@ export default function SpeedTest(props) {
     });
     const handleChangeUdp = name => event => {
         setUdpProps({ ...udpProps, [name]: event.target.value });
+        isErr();
     }
+
 
     //ping任务对话框
     const [openPingDialog, setOpenPingDialog] = React.useState(false);
@@ -154,10 +162,54 @@ export default function SpeedTest(props) {
     });
     //关闭Snackbar中的Alert信息
     const handleCloseAlert = (event, reason) => {
-        if( reason === "clickaway" )
+        if (reason === "clickaway")
             return;
         setSnackbarState({ ...snackbarState, open: false });
     }
+
+
+    {/* 对弹窗的输入框做输入校验 */ }
+    const [errState, setErrState] = React.useState({
+        err: false, //吞吐量、UDP持续时间、P2P
+        msg: '', //错误提示信息
+        disable: false, //发起攻击按钮是否可用
+        err2: false, //UDP测试速度
+        msg2: '',
+        // err3: false, //ping
+        // msg3: '',
+    });
+    const isErr = () => {
+        if (!isNumber(params) || !isNumber(udpProps.duration))
+            setErrState({
+                ...errState,
+                err: true,
+                msg: '只能输入数值',
+                disable: true,
+            })
+        else
+            setErrState({
+                ...errState,
+                err: false,
+                msg: '',
+                disable: false,
+            })
+        if (!isNumber(udpProps.speed))
+            setErrState({
+                ...errState,
+                err2: true,
+                msg2: '只能输入数值',
+                disable: true,
+            })
+        else
+            setErrState({
+                ...errState,
+                err2: false,
+                msg2: '',
+                disable: false,
+            })
+
+    }
+
 
     const [id, setId] = React.useState(-1);
     const [idTo, setIdTo] = React.useState(-1);
@@ -224,7 +276,7 @@ export default function SpeedTest(props) {
                     if (res.body.status) {
                         //任务完成后，查询丢包率，终止轮询和超时监听
                         if (res.body.data.is_done) {
-                            console.log(client_id, 'ping is done')
+                            console.log(client_id, 'ping is done, 状态信息：', res.body.data.status_detail, temp)
                             setSnackbarState({
                                 open: true,
                                 msg: res.body.data.status_detail,
@@ -1103,7 +1155,7 @@ export default function SpeedTest(props) {
             </Grid>
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={message} />
             <PingDialog open={openPingDialog} id={id} onClose={handleClosePingDialog} onChange={handleChangePingParam} onClick={handlePingMission} />
-            <UpDialog open={openUpDialog} id={id} onClose={handleCloseUpDialog} onChange={handleChangeParams} onClick={handleUploadMission} />
+            <UpDialog open={openUpDialog} id={id} err={errState.err} errMsg={errState.msg} disable={errState.disable} onClose={handleCloseUpDialog} onChange={handleChangeParams} onClick={handleUploadMission} />
             <P2PDialog
                 open={openP2PUpload}
                 id={id}
@@ -1124,14 +1176,13 @@ export default function SpeedTest(props) {
                 onChange={handleChange}
                 onClick={handleP2PDownloadTest}
             />
-            <UdpDialog open={openUdpUpload} id={id} type="上行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpUploadSpeed(id)} />
+            <UdpDialog open={openUdpUpload} id={id} type="上行" errDur={errState.err} errDurMsg={errState.msg} errSpeed={errState.err2} errSpeedMsg={errState.msg2} disable={errState.disable} onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpUploadSpeed(id)} />
             <UdpDialog open={openUdpDownload} id={id} type="下行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpDownloadSpeed(id)} />
-            {/* <Button onClick={ ()=> setSnackbarState({...snackbarState, open:true}) }>Alert</Button> */}
             {/* Ping任务完成时，在屏幕上方正中央，展示消息条 */}
-            <Snackbar open={snackbarState.open} anchorOrigin={{ vertical:'top', horizontal:'center' }}>
+            <Snackbar open={snackbarState.open} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert severity='success' variant='filled' onClose={handleCloseAlert}>
                     <AlertTitle>Ping任务已完成,状态详细信息如下：</AlertTitle>
-                    {snackbarState.msg}
+                    <pre>{snackbarState.msg}</pre> {/* Zion */}
                 </Alert>
             </Snackbar>
         </Container>

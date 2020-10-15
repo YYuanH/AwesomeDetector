@@ -78,12 +78,6 @@ export default function AttackTest(props) {
         flood_numbers: '',
     })
 
-    //以下变量用以记录点击SYN、UDP洪水攻击时的客户端各项数据
-    // const [id, setId] = React.useState(-1);
-    // const [floodType, setFloodType] = React.useState('');
-    // var ip = '';
-    // var mac = '';
-    // var cIndex = -1;
     const [synUdpStates, setSynUdpStates] = React.useState({
         id: -1,
         ip: '',
@@ -382,7 +376,6 @@ export default function AttackTest(props) {
 
     return (
         <Container maxWidth='lg' className={classes.container}>
-            {console.log(synUdpStates)}
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={msg} />
             <Grid container spacing={4}>
                 <Grid item xs={12} lg={12}>

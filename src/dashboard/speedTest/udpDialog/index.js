@@ -21,7 +21,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function UdpDialog(props) {
     const classes = useStyles();
-    const { open, id, type, onClose, onChange, onClick } = props;
+    const { open, id, type, errDur, errDurMsg, errSpeed, errSpeedMsg, disable, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -35,6 +35,8 @@ export default function UdpDialog(props) {
             <TextField
                 required
                 autoFocus
+                error={errDur}
+                helperText={errDurMsg}
                 className={classes.space}
                 id="duration"
                 label="测试持续时间"
@@ -47,6 +49,8 @@ export default function UdpDialog(props) {
             />
             <TextField
                 required
+                error={errSpeed}
+                helperText={errSpeedMsg}
                 id="speed"
                 label="测试速度"
                 onChange={onChange('speed')}
@@ -58,7 +62,7 @@ export default function UdpDialog(props) {
             />
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起UDP{type}测速</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick} disabled={disable}>发起UDP{type}测速</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog >
@@ -67,6 +71,11 @@ export default function UdpDialog(props) {
 
 UdpDialog.propTypes = {
     open: PropTypes.bool,
+    errDur: PropTypes.bool,
+    errSpeed: PropTypes.bool,
+    errDurMsg: PropTypes.string,
+    errSpeedMsg: PropTypes.string,
+    disable: PropTypes.bool,
     id: PropTypes.number,
     type: PropTypes.string,
     onClose: PropTypes.func,
