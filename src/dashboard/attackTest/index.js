@@ -1,6 +1,6 @@
 import React from 'react';
-import { Grid, TextField, FormControl, FormControlLabel, RadioGroup, Radio, FormLabel } from '@material-ui/core';
-import { makeStyles, Container, Paper, Typography, Divider, Button, Popover, CircularProgress } from '@material-ui/core';
+import { Grid, TextField, FormControl, FormControlLabel, RadioGroup, Radio, FormLabel, Tooltip } from '@material-ui/core';
+import { makeStyles, withStyles, Container, Paper, Typography, Divider, Button, Popover, CircularProgress } from '@material-ui/core';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction } from '@material-ui/core';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
@@ -62,6 +62,18 @@ const theme = createMuiTheme({
         },
     },
 });
+
+const HtmlTooltip = withStyles((theme) => ({
+    arrow: {
+        color: theme.palette.common.white,
+    },
+    tooltip: {
+        backgroundColor: theme.palette.common.white,
+        color: 'rgba(0, 0, 0, 0.87)',
+        boxShadow: theme.shadows[2],
+        fontSize: 14,
+    },
+}))(Tooltip);
 
 export default function AttackTest(props) {
     const classes = useStyles();
@@ -126,7 +138,7 @@ export default function AttackTest(props) {
         target_ip: '',
         target_port: '',
         type: '',
-        flood_numbers: '',
+        flood_numbers: '100',
     })
     const handleChange = name => event => {
         setValues({ ...values, [name]: event.target.value });
@@ -160,7 +172,7 @@ export default function AttackTest(props) {
         type: '',
     });
     //SYN、UDP洪水攻击弹窗中，输入的发包量
-    const [packNum, setPackNum] = React.useState('');
+    const [packNum, setPackNum] = React.useState('100');
     //输入改变
     const handleChangePackNum = event => { setPackNum(event.target.value) }
     //点击SYN、UDP供水攻击按钮
@@ -179,12 +191,11 @@ export default function AttackTest(props) {
     //开启弹窗
     const handleOpenSynUdp = () => { setOpenSynUdp(true); }
     //关闭弹窗
-    const handleCloseSynUdp = () => { 
-        setOpenSynUdp(false); 
-        if (errState.errPackNum) 
+    const handleCloseSynUdp = () => {
+        setOpenSynUdp(false);
+        if (errState.errPackNum)
             setErrState({ ...errState, errPackNum: false, msgPackNum: '', disablePackNum: false })
     }
-
 
 
     //关闭错误警告弹窗
@@ -194,13 +205,6 @@ export default function AttackTest(props) {
         setMsg(massege);
         setOpenErrorDialog(true);
     }
-
-
-    {/* 鼠标悬停在发包量输入框上时，出现Popover提示信息 */ }
-    const [textAnchorEl, setTextAnchorEl] = React.useState(null);
-    const openTextPopover = Boolean(textAnchorEl);
-    const handleOpenTextPopover = event => setTextAnchorEl(event.currentTarget);
-    const handleCloseTextPopover = () => setTextAnchorEl(null);
 
 
     {/** 获取客户端列表并初始化按钮状态 */ }
@@ -457,21 +461,21 @@ export default function AttackTest(props) {
                                     variant="outlined"
                                     margin="normal"
                                 />
-                                <TextField
-                                    required
-                                    className={classes.text}
-                                    error={errState.errFloodNum}
-                                    helperText={errState.msgFloodNum}
-                                    id="flood-numbers"
-                                    label="发包量"
-                                    onChange={handleChange("flood_numbers")}
-                                    onKeyUp={() => isErr('flood_numbers')}
-                                    onMouseOver={handleOpenTextPopover}
-                                    onMouseLeave={handleCloseTextPopover}
-                                    onClick={handleCloseTextPopover}
-                                    variant="outlined"
-                                    margin="normal"
-                                />
+                                <HtmlTooltip title="请确认发包量填写无误" placement="top" arrow>
+                                    <TextField
+                                        required
+                                        className={classes.text}
+                                        error={errState.errFloodNum}
+                                        helperText={errState.msgFloodNum}
+                                        id="flood-numbers"
+                                        label="发包量"
+                                        value={values.flood_numbers}
+                                        onChange={handleChange("flood_numbers")}
+                                        onKeyUp={() => isErr('flood_numbers')}
+                                        variant="outlined"
+                                        margin="normal"
+                                    />
+                                </HtmlTooltip>
                                 <FormControl className={classes.text}>
                                     <FormLabel>攻击类型：</FormLabel>
                                     <RadioGroup row value={values.type} onChange={handleChange('type')}>
@@ -567,31 +571,13 @@ export default function AttackTest(props) {
                     {popoverStr}
                 </Typography>
             </Popover>
-            {/* 鼠标悬停在发包量输入框上时，出现Popover消息提示 */}
-            <Popover
-                className={classes.popover}
-                open={openTextPopover}
-                anchorEl={textAnchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center'
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center'
-                }}
-            >
-                <Typography variant="subtitle2" className={classes.text}>
-                    发起攻击测试:<br />此操作属<b>危险操作</b>，请确认<b>发包量</b>填写无误！
-                </Typography>
-            </Popover>
-            {/* SYN、UDP洪水测试的弹窗，用以输入发包量 */}
             <FloodDialog
                 open={openSynUdp}
                 id={synUdpStates.id}
                 err={errState.errPackNum}
                 errMsg={errState.msgPackNum}
                 disable={errState.disablePackNum}
+                value={packNum}
                 onKeyUp={isErr}
                 type={synUdpStates.type}
                 onChange={handleChangePackNum}

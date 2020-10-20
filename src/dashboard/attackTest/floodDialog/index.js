@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles, withStyles, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Typography, Popover } from '@material-ui/core';
+import { makeStyles, withStyles, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tooltip, Typography, Popover } from '@material-ui/core';
 import { cyan } from '@material-ui/core/colors';
 
 const useStyles = makeStyles(theme => ({
@@ -25,15 +25,22 @@ const ColorButton = withStyles(theme => ({
     },
 }))(Button);
 
+//自定义Tooltip
+const HtmlTooltip = withStyles((theme) => ({
+    arrow: {
+        color: theme.palette.common.white,
+    },
+    tooltip: {
+        backgroundColor: theme.palette.common.white,
+        color: 'rgba(0, 0, 0, 0.87)',
+        boxShadow: theme.shadows[1],
+        fontSize: 14,
+    },
+}))(Tooltip);
+
 export default function FloodDialog(props) {
     const classes = useStyles();
-    const { open, id, type, err, errMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
-
-    {/** 攻击按钮上的浮窗 */ }
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const openPopover = Boolean(anchorEl);
-    const handleOpenPopover = event => { setAnchorEl(event.currentTarget) }
-    const handleClosePopover = () => { setAnchorEl(null) }
+    const { open, id, type, err, errMsg, disable, value, onKeyUp, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -50,6 +57,7 @@ export default function FloodDialog(props) {
                     autoFocus
                     error={err}
                     helperText={errMsg}
+                    value={value}
                     onKeyUp={() => onKeyUp('package_numbers')}
                     className={classes.space}
                     id="package-number"
@@ -60,36 +68,19 @@ export default function FloodDialog(props) {
                 />
             </DialogContent>
             <DialogActions>
-                <ColorButton
-                    variant='contained'
-                    color='primary'
-                    className={classes.button}
-                    disabled={disable}
-                    onClick={onClick}
-                    onMouseEnter={handleOpenPopover}
-                    onMouseLeave={handleClosePopover}
-                >
-                    发起{type}洪水攻击
-                </ColorButton>
+                <HtmlTooltip title="此操作危险，请确认无误" placement="bottom" arrow>
+                    <ColorButton
+                        variant='contained'
+                        color='primary'
+                        className={classes.button}
+                        disabled={disable}
+                        onClick={onClick}
+                    >
+                        发起{type}洪水攻击
+                    </ColorButton>
+                </HtmlTooltip>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
-            <Popover
-                className={classes.popover}
-                open={openPopover}
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center'
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center'
-                }}
-            >
-                <Typography variant="subtitle2" className={classes.typography}>
-                    发起{type}洪水攻击测试:<br/>此操作属<b>危险操作</b>，请<b>确认无误</b>再发起！
-                </Typography>
-            </Popover>
         </Dialog >
 
     );
@@ -102,6 +93,7 @@ FloodDialog.propTypes = {
     err: PropTypes.bool,
     errMsg: PropTypes.string,
     disable: PropTypes.bool,
+    value: PropTypes.string,
     onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
