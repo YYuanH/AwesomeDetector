@@ -21,7 +21,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function UdpDialog(props) {
     const classes = useStyles();
-    const { open, id, type, errDur, errDurMsg, errSpeed, errSpeedMsg, disable, onClose, onChange, onClick } = props;
+    const { open, id, type, errDur, errDurMsg, errSpeed, errSpeedMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -37,6 +37,7 @@ export default function UdpDialog(props) {
                 autoFocus
                 error={errDur}
                 helperText={errDurMsg}
+                onKeyUp={ () => onKeyUp('duration') }
                 className={classes.space}
                 id="duration"
                 label="测试持续时间"
@@ -51,6 +52,7 @@ export default function UdpDialog(props) {
                 required
                 error={errSpeed}
                 helperText={errSpeedMsg}
+                onKeyUp={ () => onKeyUp('speed') }
                 id="speed"
                 label="测试速度"
                 onChange={onChange('speed')}
@@ -78,6 +80,7 @@ UdpDialog.propTypes = {
     disable: PropTypes.bool,
     id: PropTypes.number,
     type: PropTypes.string,
+    onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,

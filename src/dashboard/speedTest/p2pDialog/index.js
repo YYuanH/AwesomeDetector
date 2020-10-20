@@ -23,7 +23,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function P2PDialog(props) {
     const classes = useStyles();
-    const { open, id, idTo, clientList, type, onClose, onChange, onClick } = props;
+    const { open, id, idTo, clientList, type, err, errMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
 
     return (
         <Dialog
@@ -38,6 +38,9 @@ export default function P2PDialog(props) {
                 <TextField
                     required
                     autoFocus
+                    error={err}
+                    helperText={errMsg}
+                    onKeyUp={() => onKeyUp('size')}
                     className={classes.space}
                     id="param"
                     label="测速数据"
@@ -66,7 +69,7 @@ export default function P2PDialog(props) {
                 </RadioGroup>
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>确认</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick} disabled={disable}>确认</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog>
@@ -79,6 +82,10 @@ P2PDialog.propTypes = {
     idTo: PropTypes.number,
     clientList: PropTypes.array,
     type: PropTypes.string,
+    err: PropTypes.bool,
+    errMsg: PropTypes.string,
+    disable: PropTypes.bool,
+    onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,

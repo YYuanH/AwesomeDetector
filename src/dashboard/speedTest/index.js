@@ -65,48 +65,42 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-// {/* 控制图表的环形进度条 */ }
-// const loadingReducer = (state, action) => {
-//     switch (action.type) {
-//         // case 'OPEN_UPLOAD':
-//         //     return { ...state, uploadChartLoading: true };
-//         // case 'OPEN_DOWNLOAD':
-//         //     return { ...state, downloadChartLoading: true };
-//         case 'OPEN_PING':
-//             return { ...state, pingTableLoading: true };
-//         case 'OPEN_ROUTER':
-//             return { ...state, routerTableLoading: true };
-//         // case 'CLOSE_UPLOAD':
-//         //     return { ...state, uploadChartLoading: false };
-//         // case 'CLOSE_DOWNLOAD':
-//         //     return { ...state, downloadChartLoading: false };
-//         case 'CLOSE_PING':
-//             return { ...state, pingTableLoading: false };
-//         case 'CLOSE_ROUTER':
-//             return { ...state, routerTableLoading: false };
-//     }
-// }
-
 //4个全局变量用以保存上次的数据
 let preUpData = {};
 let preDownData = {};
 let preDelayData = {};
 let preValues = {};
-// let preLossRate, preRouters;
 let preClientIdUp, preClientIdDown, preDelayClientId;
 
 
 export default function SpeedTest(props) {
     const classes = useStyles();
     const [onlineMachineList, setOnlineMachineList] = React.useState(Array);
+    
+    const [id, setId] = React.useState(-1);
+    const [idTo, setIdTo] = React.useState(-1);
+    const [clientList, setClientList] = React.useState(Array);
 
+    const [upData, setUpData] = React.useState({});
+    const [downData, setDownData] = React.useState({});
+    const [delayData, setDelayData] = React.useState({});
+    const [values, setValues] = React.useState({
+        loss_rate: '', //丢包率
+        routers: '' //路由跳数
+    });
+
+
+    {/* P2P弹窗 */}
     const [openP2PUpload, setOpenP2PUpload] = React.useState(false);//p2p上行测速对话框
     const [openP2PDownload, setOpenP2PDownload] = React.useState(false);//p2p下行测速对话框
     const handleCloseP2PDialog = () => {
         if (openP2PUpload) setOpenP2PUpload(false);
         if (openP2PDownload) setOpenP2PDownload(false);
+        if (errState.err) setErrState({ ...errState, err: false, errMsg: '', disable: false })
     }
 
+
+    {/* 错误弹窗 */}
     const [openErrorDialog, setOpenErrorDialog] = React.useState(false);//报错弹窗
     const [message, setMessage] = React.useState('');//报错信息
     //关闭错误警告
@@ -118,17 +112,21 @@ export default function SpeedTest(props) {
     }
 
 
-    //吞吐量上行测速对话框
+    {/* 吞吐量上行测速弹窗 */}
     const [openUpDialog, setOpenUpDialog] = React.useState(false);
     const [params, setParams] = React.useState(-1); //吞吐量上行测速参数 || P2P输入框参数
-    const handleCloseUpDialog = () => setOpenUpDialog(false);
+    const handleCloseUpDialog = () => {
+        setOpenUpDialog(false);
+        //判断输入框中的数据是否合法，若不是，则在关闭弹窗时，恢复输入框为合法状态
+        if(errState.err)
+            setErrState({ ...errState, err: false, msg: '', disable: false })
+    }
     const handleChangeParams = event => {
         setParams(event.target.value);
-        isErr();
     }
 
 
-    //UDP任务对话框
+    {/* UDP任务弹窗 */}
     const [openUdpUpload, setOpenUdpUpload] = React.useState(false); //UDP上行测速任务对话框
     const [openUdpDownload, setOpenUdpDownload] = React.useState(false); //UDP下行测速任务对话框
     const handleCloseUdpDialog = () => {
@@ -136,6 +134,25 @@ export default function SpeedTest(props) {
             setOpenUdpUpload(false);
         } else {
             setOpenUdpDownload(false);
+        }
+        //判断输入框中的数据是否合法，若不合法，则在关闭弹窗时，恢复输入框为合法状态
+        if (errState.err && errState.err2) {
+            setErrState({
+                err: false,
+                msg: '',
+                err2: false,
+                msg2: '',
+                disable: false
+            })
+        }
+        else if ( errState.err && !errState.err2 ) {
+            setErrState({ ...errState, err: false, msg: '', disable: false })
+        }
+        else if ( !errState.err && errState.err2 ) {
+            setErrState({ ...errState, err2: false, msg2: '', disable: false })
+        }
+        else {
+            return;
         }
     }
     //UDP输入框参数
@@ -145,16 +162,19 @@ export default function SpeedTest(props) {
     });
     const handleChangeUdp = name => event => {
         setUdpProps({ ...udpProps, [name]: event.target.value });
-        isErr();
     }
 
 
-    //ping任务对话框
+    {/* ping任务对话框 */}
     const [openPingDialog, setOpenPingDialog] = React.useState(false);
-    const handleClosePingDialog = () => setOpenPingDialog(false);
+    const handleClosePingDialog = () => {
+        setOpenPingDialog(false);
+        if(errState.err)
+            setErrState({ ...errState, err: false, msg: '', disable: false })
+    }
     //ping任务输入参数
     const [pingParam, setPingParam] = React.useState('');
-    const handleChangePingParam = event => setPingParam(event.target.value);
+    const handleChangePingParam = event => { setPingParam(event.target.value) }
     //ping任务正常结束后，打开Snackbar消息条，显示相关信息
     const [snackbarState, setSnackbarState] = React.useState({
         open: false,
@@ -172,56 +192,40 @@ export default function SpeedTest(props) {
     const [errState, setErrState] = React.useState({
         err: false, //吞吐量、UDP持续时间、P2P
         msg: '', //错误提示信息
-        disable: false, //发起攻击按钮是否可用
         err2: false, //UDP测试速度
         msg2: '',
-        // err3: false, //ping
-        // msg3: '',
+        disable: false, //发起攻击按钮是否可用
     });
-    const isErr = () => {
-        if (!isNumber(params) || !isNumber(udpProps.duration))
-            setErrState({
-                ...errState,
-                err: true,
-                msg: '只能输入数值',
-                disable: true,
-            })
-        else
-            setErrState({
-                ...errState,
-                err: false,
-                msg: '',
-                disable: false,
-            })
-        if (!isNumber(udpProps.speed))
-            setErrState({
-                ...errState,
-                err2: true,
-                msg2: '只能输入数值',
-                disable: true,
-            })
-        else
-            setErrState({
-                ...errState,
-                err2: false,
-                msg2: '',
-                disable: false,
-            })
-
+    const isErr = type => {
+        switch (type) {
+            case 'size':
+                if (!isNumber(params))
+                    setErrState({ ...errState, err: true, msg: '只能输入数值', disable: true })
+                else
+                    setErrState({ ...errState, err: false, msg: '', disable: false })
+                break;
+            case 'duration':
+                if (!isNumber(udpProps.duration))
+                    setErrState({ ...errState, err: true, msg: '只能输入数值', disable: true })
+                else
+                    setErrState({ ...errState, err: false, msg: '', disable: false })
+                break;
+            case 'speed':
+                if (!isNumber(udpProps.speed))
+                    setErrState({ ...errState, err2: true, msg2: '只能输入数值', disable: true })
+                else
+                    setErrState({ ...errState, err2: false, msg2: '', disable: false })
+                break;
+            case 'pingParam':
+                if (isNumber(pingParam))
+                    setErrState({ ...errState, err: true, msg: '只能输入IP地址或域名', disable: true })
+                else
+                    setErrState({ ...errState, err: false, msg: '', disable: false })
+                break;
+            default:
+                break;
+        }
     }
-
-
-    const [id, setId] = React.useState(-1);
-    const [idTo, setIdTo] = React.useState(-1);
-    const [clientList, setClientList] = React.useState(Array);
-
-    const [upData, setUpData] = React.useState({});
-    const [downData, setDownData] = React.useState({});
-    const [delayData, setDelayData] = React.useState({});
-    const [values, setValues] = React.useState({
-        loss_rate: '', //丢包率
-        routers: '' //路由跳数
-    });
 
 
     //获取客户端列表
@@ -1154,12 +1158,36 @@ export default function SpeedTest(props) {
                 </Grid>
             </Grid>
             <ErrorDialog open={openErrorDialog} handleClose={handleCloseErrorDialog} msg={message} />
-            <PingDialog open={openPingDialog} id={id} onClose={handleClosePingDialog} onChange={handleChangePingParam} onClick={handlePingMission} />
-            <UpDialog open={openUpDialog} id={id} err={errState.err} errMsg={errState.msg} disable={errState.disable} onClose={handleCloseUpDialog} onChange={handleChangeParams} onClick={handleUploadMission} />
+            <PingDialog 
+                open={openPingDialog} 
+                id={id} 
+                err={errState.err} 
+                errMsg={errState.msg} 
+                disable={errState.disable} 
+                onKeyUp={isErr} 
+                onClose={handleClosePingDialog} 
+                onChange={handleChangePingParam} 
+                onClick={handlePingMission}
+            />
+            <UpDialog 
+                open={openUpDialog} 
+                id={id} 
+                err={errState.err} 
+                errMsg={errState.msg} 
+                disable={errState.disable} 
+                onKeyUp={isErr} 
+                onClose={handleCloseUpDialog} 
+                onChange={handleChangeParams} 
+                onClick={handleUploadMission} 
+            />
             <P2PDialog
                 open={openP2PUpload}
                 id={id}
                 idTo={idTo}
+                err={errState.err}
+                errMsg={errState.msg}
+                disable={errState.disable}
+                onKeyUp={isErr}
                 clientList={clientList}
                 type="上行"
                 onClose={handleCloseP2PDialog}
@@ -1170,14 +1198,44 @@ export default function SpeedTest(props) {
                 open={openP2PDownload}
                 id={id}
                 idTo={idTo}
+                err={errState.err}
+                errMsg={errState.msg}
+                disable={errState.disable}
+                onKeyUp={isErr}
                 clientList={clientList}
                 type="下行"
                 onClose={handleCloseP2PDialog}
                 onChange={handleChange}
                 onClick={handleP2PDownloadTest}
             />
-            <UdpDialog open={openUdpUpload} id={id} type="上行" errDur={errState.err} errDurMsg={errState.msg} errSpeed={errState.err2} errSpeedMsg={errState.msg2} disable={errState.disable} onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpUploadSpeed(id)} />
-            <UdpDialog open={openUdpDownload} id={id} type="下行" onClose={handleCloseUdpDialog} onChange={handleChangeUdp} onClick={() => handleTestUdpDownloadSpeed(id)} />
+            <UdpDialog 
+                open={openUdpUpload} 
+                id={id} 
+                type="上行" 
+                errDur={errState.err} 
+                errDurMsg={errState.msg} 
+                errSpeed={errState.err2} 
+                errSpeedMsg={errState.msg2} 
+                disable={errState.disable} 
+                onKeyUp={isErr} 
+                onClose={handleCloseUdpDialog} 
+                onChange={handleChangeUdp} 
+                onClick={() => handleTestUdpUploadSpeed(id)} 
+            />
+            <UdpDialog 
+                open={openUdpDownload} 
+                id={id} 
+                type="下行" 
+                errDur={errState.err} 
+                errDurMsg={errState.msg} 
+                errSpeed={errState.err2} 
+                errSpeedMsg={errState.msg2} 
+                disable={errState.disable} 
+                onKeyUp={isErr} 
+                onClose={handleCloseUdpDialog} 
+                onChange={handleChangeUdp} 
+                onClick={() => handleTestUdpDownloadSpeed(id)} 
+            />
             {/* Ping任务完成时，在屏幕上方正中央，展示消息条 */}
             <Snackbar open={snackbarState.open} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert severity='success' variant='filled' onClose={handleCloseAlert}>

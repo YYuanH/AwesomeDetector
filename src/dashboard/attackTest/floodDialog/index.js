@@ -27,7 +27,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function FloodDialog(props) {
     const classes = useStyles();
-    const { open, id, type, onClose, onChange, onClick } = props;
+    const { open, id, type, err, errMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
 
     {/** 攻击按钮上的浮窗 */ }
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -48,6 +48,9 @@ export default function FloodDialog(props) {
                 <TextField
                     required
                     autoFocus
+                    error={err}
+                    helperText={errMsg}
+                    onKeyUp={() => onKeyUp('package_numbers')}
                     className={classes.space}
                     id="package-number"
                     label="发包量"
@@ -61,6 +64,7 @@ export default function FloodDialog(props) {
                     variant='contained'
                     color='primary'
                     className={classes.button}
+                    disabled={disable}
                     onClick={onClick}
                     onMouseEnter={handleOpenPopover}
                     onMouseLeave={handleClosePopover}
@@ -95,6 +99,10 @@ FloodDialog.propTypes = {
     open: PropTypes.bool,
     id: PropTypes.number,
     type: PropTypes.string,
+    err: PropTypes.bool,
+    errMsg: PropTypes.string,
+    disable: PropTypes.bool,
+    onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,

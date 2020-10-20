@@ -10,6 +10,8 @@ import { GetList } from '../../api/speedTest';
 import { CreateMission, IsFinished, GetResult, CreateAttackMission } from '../../api/mission';
 import ErrorDialog from '../speedTest/errorDialog';
 import FloodDialog from './floodDialog';
+import isNumber from '../../utils/isNumber';
+import isIP from '../../utils/isIP';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -71,20 +73,65 @@ export default function AttackTest(props) {
     const [clientList, setClientList] = React.useState(Array);
     //primary表示“安全”，secondary表示“有风险”，default表示“尚未测试” 
     const [states, setStates] = React.useState(Array);
+
+
+    {/* 输入校验 */ }
+    const [errState, setErrState] = React.useState({
+        errIP: false,
+        errPort: false,
+        errFloodNum: false,
+        errPackNum: false,
+        msgIP: '',
+        msgPort: '',
+        msgFloodNum: '',
+        msgPackNum: '',
+        disableIP: false,
+        disablePort: false,
+        disableFloodNum: false,
+        disablePackNum: false,
+    })
+    const isErr = type => {
+        switch (type) {
+            case 'target_ip':
+                if (!isIP(values.target_ip))
+                    setErrState({ ...errState, errIP: true, msgIP: 'IP地址不合法', disableIP: true })
+                else
+                    setErrState({ ...errState, errIP: false, msgIP: '', disableIP: false })
+                break;
+            case 'target_port':
+                if (!isNumber(values.target_port))
+                    setErrState({ ...errState, errPort: true, msgPort: '只能输入整数', disablePort: true })
+                else
+                    setErrState({ ...errState, errPort: false, msgPort: '', disablePort: false })
+                break;
+            case 'flood_numbers':
+                if (!isNumber(values.flood_numbers))
+                    setErrState({ ...errState, errFloodNum: true, msgFloodNum: '只能输入整数', disableFloodNum: true })
+                else
+                    setErrState({ ...errState, errFloodNum: false, msgFloodNum: '', disableFloodNum: false })
+                break;
+            case 'package_numbers':
+                if (!isNumber(packNum))
+                    setErrState({ ...errState, errPackNum: true, msgPackNum: '只能输入整数', disablePackNum: true })
+                else
+                    setErrState({ ...errState, errPackNum: false, msgPackNum: '', disablePackNum: false })
+                break;
+            default:
+                break;
+        }
+    }
+
+    {/* 对任意客户端发起攻击， */ }
     const [values, setValues] = React.useState({
         target_ip: '',
         target_port: '',
         type: '',
         flood_numbers: '',
     })
+    const handleChange = name => event => {
+        setValues({ ...values, [name]: event.target.value });
+    }
 
-    const [synUdpStates, setSynUdpStates] = React.useState({
-        id: -1,
-        ip: '',
-        mac: '',
-        index: -1,
-        type: '',
-    });
 
     //关闭三个攻击按钮上的Popover
     const handleClosePopover = () => setAnchorEl(null);
@@ -104,7 +151,18 @@ export default function AttackTest(props) {
         setAnchorEl(event.currentTarget);
     }
 
-
+    {/* SYN UDP洪水所需的额外参数 */ }
+    const [synUdpStates, setSynUdpStates] = React.useState({
+        id: -1,
+        ip: '',
+        mac: '',
+        index: -1,
+        type: '',
+    });
+    //SYN、UDP洪水攻击弹窗中，输入的发包量
+    const [packNum, setPackNum] = React.useState('');
+    //输入改变
+    const handleChangePackNum = event => { setPackNum(event.target.value) }
     //点击SYN、UDP供水攻击按钮
     const handleClickSynUdp = (clientId, clientIP, clientMAC, synUdpType, clientIndex) => {
         setSynUdpStates({
@@ -115,21 +173,18 @@ export default function AttackTest(props) {
             type: synUdpType,
         });
         handleOpenSynUdp(); //打开弹窗
-
     }
-
-    //SYN/UDP攻击弹窗的开启关闭状态
+    {/* SYN/UDP攻击弹窗的开启关闭状态 */ }
     const [openSynUdp, setOpenSynUdp] = React.useState(false);
     //开启弹窗
     const handleOpenSynUdp = () => { setOpenSynUdp(true); }
     //关闭弹窗
-    const handleCloseSynUdp = () => { setOpenSynUdp(false); }
+    const handleCloseSynUdp = () => { 
+        setOpenSynUdp(false); 
+        if (errState.errPackNum) 
+            setErrState({ ...errState, errPackNum: false, msgPackNum: '', disablePackNum: false })
+    }
 
-
-    //SYN、UDP洪水攻击弹窗中，输入的发包量
-    const [packNum, setPackNum] = React.useState('');
-    //输入改变
-    const handleChangePackNum = event => { setPackNum(event.target.value) }
 
 
     //关闭错误警告弹窗
@@ -363,15 +418,7 @@ export default function AttackTest(props) {
         }).catch(err => console.log(err));
     }
 
-    const handleChange = name => event => {
-        // if (name === 'target_ip')
-        //     setValues({ ...values, [name]: event.target.value })
-        // else if (name === "target_port")
-        //     setValues({ ...values, [name]: event.target.value })
-        // else
-        //     setValues({ ...values, [name]: event.target.value })
-        setValues({ ...values, [name]: event.target.value })
-    }
+
 
 
     return (
@@ -389,27 +436,36 @@ export default function AttackTest(props) {
                                 <TextField
                                     required
                                     className={classes.text}
+                                    error={errState.errIP}
+                                    helperText={errState.msgIP}
                                     id="ip"
                                     label="IP地址"
                                     onChange={handleChange("target_ip")}
+                                    onKeyUp={() => isErr('target_ip')}
                                     variant="outlined"
                                     margin="normal"
                                 />
                                 <TextField
                                     required
                                     className={classes.text}
+                                    error={errState.errPort}
+                                    helperText={errState.msgPort}
                                     id="port"
                                     label="端口"
                                     onChange={handleChange("target_port")}
+                                    onKeyUp={() => isErr('target_port')}
                                     variant="outlined"
                                     margin="normal"
                                 />
                                 <TextField
                                     required
                                     className={classes.text}
+                                    error={errState.errFloodNum}
+                                    helperText={errState.msgFloodNum}
                                     id="flood-numbers"
                                     label="发包量"
                                     onChange={handleChange("flood_numbers")}
+                                    onKeyUp={() => isErr('flood_numbers')}
                                     onMouseOver={handleOpenTextPopover}
                                     onMouseLeave={handleCloseTextPopover}
                                     onClick={handleCloseTextPopover}
@@ -426,7 +482,7 @@ export default function AttackTest(props) {
                                 </FormControl>
                             </Grid>
                             <Grid item lg={12} className={classes.box}>
-                                <Button type='submit' variant='contained' color='primary' className={classes.attack_button}>
+                                <Button type='submit' variant='contained' color='primary' className={classes.attack_button} disabled={errState.disableIP || errState.disablePort || errState.disableFloodNum}>
                                     发起攻击测试
                                 </Button>
                             </Grid>
@@ -533,6 +589,10 @@ export default function AttackTest(props) {
             <FloodDialog
                 open={openSynUdp}
                 id={synUdpStates.id}
+                err={errState.errPackNum}
+                errMsg={errState.msgPackNum}
+                disable={errState.disablePackNum}
+                onKeyUp={isErr}
                 type={synUdpStates.type}
                 onChange={handleChangePackNum}
                 onClose={handleCloseSynUdp}

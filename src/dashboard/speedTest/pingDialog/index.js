@@ -21,7 +21,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function PingDialog(props) {
     const classes = useStyles();
-    const { open, id, onClose, onChange, onClick } = props;
+    const { open, id, err, errMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -35,19 +35,19 @@ export default function PingDialog(props) {
             <TextField
                 required
                 autoFocus
+                error={err}
+                helperText={errMsg}
+                onKeyUp={ () => onKeyUp('pingParam') }
                 className={classes.space}
                 id="params"
-                label="参数"
+                label="IP地址或域名"
                 onChange={onChange}
                 variant="outlined"
                 margin="normal"
-                // InputProps={{
-                //     endAdornment: <InputAdornment position="end">MB</InputAdornment>,
-                // }}
             />
             </DialogContent>
             <DialogActions>
-                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick}>发起任务</ColorButton>
+                <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClick} disabled={disable}>发起任务</ColorButton>
                 <ColorButton variant='contained' color='primary' className={classes.button} onClick={onClose}>取消</ColorButton>
             </DialogActions>
         </Dialog >
@@ -57,6 +57,10 @@ export default function PingDialog(props) {
 PingDialog.propTypes = {
     open: PropTypes.bool,
     id: PropTypes.number,
+    err: PropTypes.bool,
+    errMsg: PropTypes.string,
+    disable: PropTypes.bool,
+    onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,

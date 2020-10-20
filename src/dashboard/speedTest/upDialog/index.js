@@ -21,7 +21,7 @@ const ColorButton = withStyles(theme => ({
 
 export default function UpDialog(props) {
     const classes = useStyles();
-    const { open, id, err, errMsg, disable, onClose, onChange, onClick } = props;
+    const { open, id, err, errMsg, disable, onKeyUp, onClose, onChange, onClick } = props;
 
     return (
         < Dialog
@@ -37,6 +37,7 @@ export default function UpDialog(props) {
                 autoFocus
                 error={err}
                 helperText={errMsg}
+                onKeyUp={ () => onKeyUp('size') }
                 className={classes.space}
                 id="params"
                 label="测速数据"
@@ -62,6 +63,7 @@ UpDialog.propTypes = {
     errMsg: PropTypes.string,
     disable: PropTypes.bool,
     id: PropTypes.number,
+    onKeyUp: PropTypes.func,
     onClose: PropTypes.func,
     onChange: PropTypes.func,
     onClick: PropTypes.func,
