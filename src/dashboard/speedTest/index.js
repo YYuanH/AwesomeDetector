@@ -933,7 +933,7 @@ export default function SpeedTest(props) {
             }
         });
         upload.duration = udpProps.duration;
-        upload.speed = parseFloat(udpProps.speed) * 122.0703125;
+        upload.speed = parseFloat(udpProps.speed) * 128;
         list[index].udpUploadLoading = true;
         mission_type1 = 'udp_upload_mission';
         setOnlineMachineList(list);
@@ -1065,7 +1065,7 @@ export default function SpeedTest(props) {
             }
         });
         download.duration = udpProps.duration;
-        download.speed = parseFloat(udpProps.speed) * 122.0703125;
+        download.speed = parseFloat(udpProps.speed) * 128;
         list[index].udpDownloadLoading = true;
         mission_type1 = 'udp_download_mission';
         setOnlineMachineList(list);
