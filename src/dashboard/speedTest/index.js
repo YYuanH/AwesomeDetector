@@ -260,8 +260,9 @@ export default function SpeedTest(props) {
     const checkPing = (mission_id, client_id, index, mission_type1) => {
         var data1 = { mission_id: mission_id };
         var data2 = { client_id: client_id };
-        var end_time = Date.parse(new Date());
-        var start_time = end_time - 24 * 60 * 60 * 1000;
+        var now = Date.parse(new Date());
+        var end_time = now + 60 * 60 * 1000;
+        var start_time = now - 24 * 60 * 60 * 1000;
         var data_delay = {
             client_id: client_id,
             start_time: start_time,
@@ -478,8 +479,9 @@ export default function SpeedTest(props) {
     //轮询获取吞吐量上行数据，并判断任务是否完成
     const checkUpload = (mission_id, client_id, index, mission_type1) => {
         var data = { mission_id: mission_id };
-        var end_time = Date.parse(new Date());
-        var start_time = end_time - 24 * 60 * 60 * 1000;
+        var now = Date.parse(new Date());
+        var end_time = now + 60 * 60 * 1000;
+        var start_time = now - 24 * 60 * 60 * 1000;
         var data2 = {
             client_id: client_id,
             start_time: start_time,
@@ -528,8 +530,9 @@ export default function SpeedTest(props) {
     //轮询获取下行速率，并检查任务是否完成
     const checkDownload = (mission_id, client_id, index, mission_type2) => {
         var data1 = { mission_id: mission_id };
-        var end_time = Date.parse(new Date());
-        var start_time = end_time - 24 * 60 * 60 * 1000;
+        var now = Date.parse(new Date());
+        var end_time = now + 60 * 60 * 1000;
+        var start_time = now - 24 * 60 * 60 * 1000;
         var data2 = {
             client_id: client_id,
             start_time: start_time,
@@ -660,8 +663,9 @@ export default function SpeedTest(props) {
                 //超时
                 document.uploadMissionTimeout[id][mission_type1] = setTimeout(() => {
                     var list = [].concat(onlineMachineList);
-                    var end_time = Date.parse(new Date());
-                    var start_time = end_time - 30 * 24 * 60 * 60 * 1000;
+                    var now = Date.parse(new Date());
+                    var end_time = now + 60 * 60 * 1000;
+                    var start_time = now - 30 * 24 * 60 * 60 * 1000;
                     var data2 = {
                         client_id: id,
                         start_time: start_time,
@@ -759,8 +763,9 @@ export default function SpeedTest(props) {
                 //超时
                 document.downloadMissionTimeout[id][mission_type2] = setTimeout(() => {
                     var list = [].concat(onlineMachineList);
-                    var end_time = Date.parse(new Date());
-                    var start_time = end_time - 30 * 24 * 60 * 60 * 1000;
+                    var now = Date.parse(new Date());
+                    var end_time = now + 60 * 60 * 1000;
+                    var start_time = now - 30 * 24 * 60 * 60 * 1000;
                     var data2 = {
                         client_id: id,
                         start_time: start_time,
@@ -871,8 +876,9 @@ export default function SpeedTest(props) {
     //轮询UDP上行测速任务是否完成 
     const checkUdpUpload = (mission_id, client_id, index, mission_type1) => {
         const data = { mission_id: mission_id };
-        var end_time = Date.parse(new Date());
-        var start_time = end_time - 24 * 60 * 60 * 1000;
+        var now = Date.parse(new Date());
+        var end_time = now + 60 * 60 * 1000;
+        var start_time = now - 24 * 60 * 60 * 1000;
         var data2 = {
             client_id: client_id,
             start_time: start_time,
@@ -884,7 +890,7 @@ export default function SpeedTest(props) {
                 var temp = res.body.data.upload_speed;
                 setUpData(temp);
                 preUpData = temp;
-                console.log(client_id, 'Require the data of UDP upload speed...', temp);
+                console.log(client_id, 'Require the data of UDP upload speed...');
             } else {
                 console.log(res.body); //返回错误信息
                 handleOpenErrorDialog('客户端' + client_id + '：无法获取UDP上行速率的数据');
@@ -964,8 +970,9 @@ export default function SpeedTest(props) {
                 document.checkUdpUploadTimerInterval[id][mission_type1] = setInterval(checkUdpUpload, 1000, mission_id, id, index, mission_type1);
                 //超时
                 document.udpUploadMissionTimeout[id][mission_type1] = setTimeout(() => {
-                    var end_time = Date.parse(new Date());
-                    var start_time = end_time - 30 * 24 * 60 * 60 * 1000;
+                    var now = Date.parse(new Date());
+                    var end_time = now + 60 * 60 * 1000;
+                    var start_time = now - 30 * 24 * 60 * 60 * 1000;
                     var data2 = {
                         client_id: id,
                         start_time: start_time,
@@ -1002,8 +1009,9 @@ export default function SpeedTest(props) {
     //轮询UDP下行测速任务是否完成 
     const checkUdpDownload = (mission_id, client_id, index, mission_type1) => {
         var data = { mission_id: mission_id };
-        var end_time = Date.parse(new Date());
-        var start_time = end_time - 24 * 60 * 60 * 1000;
+        var now = Date.parse(new Date());
+        var end_time = now + 60 * 60 * 1000;
+        var start_time = now - 24 * 60 * 60 * 1000;
         var data2 = {
             client_id: client_id,
             start_time: start_time,
@@ -1096,8 +1104,9 @@ export default function SpeedTest(props) {
                 document.checkUdpDownloadTimerInterval[id][mission_type1] = setInterval(checkUdpDownload, 1000, mission_id, id, index, mission_type1);
                 //超时
                 document.udpDownloadMissionTimeout[id][mission_type1] = setTimeout(() => {
-                    var end_time = Date.parse(new Date());
-                    var start_time = end_time - 30 * 24 * 60 * 60 * 1000;
+                    var now = Date.parse(new Date());
+                    var end_time = now + 60 * 60 * 1000;
+                    var start_time = now - 30 * 24 * 60 * 60 * 1000;
                     var data2 = {
                         client_id: id,
                         start_time: start_time,
