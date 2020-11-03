@@ -183,7 +183,7 @@ export default class MyLine extends Component {
                 shadowBlur: 10,
               }
             },
-            data: !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1024/1024).toFixed(3) : null)
+            data: !!this.props.extraData ? this.props.data[item].map(item => !!item ? parseInt(item) : item) : this.props.data[item].map(item => !!item ? (item/1000/1000).toFixed(3) : null)
           };
         }
         return null;
